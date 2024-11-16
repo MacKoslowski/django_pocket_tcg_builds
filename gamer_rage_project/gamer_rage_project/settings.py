@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 from dotenv import load_dotenv
-
+import os
 load_dotenv()
 
 
@@ -47,8 +47,50 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.discord',
+    #mine 
     'core'
 ]
+SITE_ID = 1
+# Auth Settings
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+# SECURITY WARNING: keep the secret key used in production secret!
+CLIENT_ID = os.environ.get("client_id")
+DISCORD_SECRET = os.environ.get('client_secret')
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = os.environ.get("DEBUG") == "True"
+
+# Discord Specific Settings
+DISCORD_KEY = os.environ.get('public_key')
+SOCIALACCOUNT_PROVIDERS = {
+    'discord': {
+        'APP': {
+            'client_id': CLIENT_ID,
+            'secret': DISCORD_SECRET,
+            'key': DISCORD_KEY
+        },
+         'SCOPE': ['identify', 'email'],
+        'AUTH_PARAMS': {'prompt': 'consent'},
+    }
+}
+
+# Auth Settings
+ACCOUNT_EMAIL_REQUIRED = False
+SOCIALACCOUNT_AUTO_SIGNUP = True
+ACCOUNT_AUTHENTICATION_METHOD = 'username'
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = False
+LOGIN_URL = 'account_login'
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'http'  # Add this
+LOGIN_REDIRECT_URL = '/'
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+# Disable regular authentication forms
+ACCOUNT_ALLOW_REGISTRATION = False
+#ACCOUNT_ADAPTER = 'core.adapters.NoNewUsersAccountAdapter'
+#SOCIALACCOUNT_ADAPTER = 'core.adapters.CustomSocialAccountAdapter'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

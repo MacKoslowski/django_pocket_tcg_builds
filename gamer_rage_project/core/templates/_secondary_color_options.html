@@ -1,0 +1,5 @@
+<!-- templates/core/_secondary_color_options.html -->
+<option value="">None</option>
+{% for value, label in color_types %}
+<option value="{{ value }}">{{ label|title }}</option>
+{% endfor %}

@@ -108,12 +108,12 @@ class Deck(models.Model):
     )
     user_title = models.CharField(max_length=30)
     user_description = models.CharField(max_length=200)
-    color_1 = models.CharField(max_length=30)
-    color_2 = models.IntegerField(max_length=30)
+    color_1 = models.CharField(max_length=30,  choices=ColorTypes.choices)
+    color_2 = models.CharField(max_length=30,  choices=ColorTypes.choices) 
     created_at = models.DateTimeField(auto_now_add=True)  # Set once when created
-    public = models.BooleanField()
+    public = models.BooleanField(default=False)
     modified_at = models.DateTimeField(auto_now=True)     # Updates on every save
-    flagged = models.BooleanField()
+    flagged = models.BooleanField(default=False)
     # ManyToMany relationship with Card through DeckCard
     cards = models.ManyToManyField(Card, through='DeckCard')
     

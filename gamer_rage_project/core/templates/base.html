@@ -3,9 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>
-      {% block title %}PokéDecks - Pokemon TCG Deck Builder{% endblock %}
-    </title>
+    <title>{% block title %}Pocket Builds{% endblock %}</title>
     {% load static %}
     <!-- Bootstrap CSS -->
     <link href="{% static '/bootstrap.min.css' %}" rel="stylesheet" />
@@ -17,8 +15,8 @@
   </head>
   <body class="bg-light">
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <div class="container">
+    <nav class="navbar navbar-expand-lg bg-light">
+      <div class="container-fluid">
         <a class="navbar-brand d-flex align-items-center" href="">
           <!--<img
             src="{% static 'images/pokeball.svg' %}"
@@ -26,7 +24,7 @@
             height="30"
             class="me-2"
           />-->
-          PokéDecks
+          Pocket Builds
         </a>
         <button
           class="navbar-toggler"
@@ -101,11 +99,7 @@
 
     <!-- Footer -->
     <footer class="footer mt-auto py-3 bg-dark text-light">
-      <div class="container text-center">
-        <span
-          >© 2024 PokéDecks - Built with ❤️ for the Pokémon TCG Community</span
-        >
-      </div>
+      <div class="container text-center">footer</div>
     </footer>
 
     <!-- Bootstrap Bundle with Popper -->
