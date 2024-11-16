@@ -3,20 +3,31 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% block title %}Django Discord App{% endblock %}</title>
+    <title>
+      {% block title %}PokéDecks - Pokemon TCG Deck Builder{% endblock %}
+    </title>
     {% load static %}
     <!-- Bootstrap CSS -->
-    <link href="{% static 'bootstrap.min.css' %}" rel="stylesheet" />
-
+    <link href="{% static '/bootstrap.min.css' %}" rel="stylesheet" />
+    <!-- Custom CSS -->
+    <link href="{% static '/style.css' %}" rel="stylesheet" />
     <!-- HTMX -->
-    <script src="{% static 'htmx.min.js' %}"></script>
-
-    {% block extra_css %}{% endblock %}
+    <script src="{% static '/htmx.min.js' %}"></script>
+    {% block extra_head %}{% endblock %}
   </head>
-  <body>
+  <body class="bg-light">
+    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container">
-        <a class="navbar-brand" href="{% url 'core:home' %}">Django Discord</a>
+        <a class="navbar-brand d-flex align-items-center" href="">
+          <!--<img
+            src="{% static 'images/pokeball.svg' %}"
+            width="30"
+            height="30"
+            class="me-2"
+          />-->
+          PokéDecks
+        </a>
         <button
           class="navbar-toggler"
           type="button"
@@ -26,27 +37,79 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
-            {% if user.is_authenticated %}
+          <ul class="navbar-nav me-auto">
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'account_logout' %}">Logout</a>
+              <a class="nav-link" href="#">Home</a>
             </li>
-            {% else %}
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'socialaccount_connections' %}"
-                >Login with Discord</a
-              >
+              <a class="nav-link" href="#">Browse Decks</a>
             </li>
-            {% endif %}
+            <li class="nav-item">
+              <a class="nav-link" href="#">Meta Analysis</a>
+            </li>
           </ul>
+          <div class="d-flex">
+            {% if user.is_authenticated %}
+            <div class="dropdown">
+              <button
+                class="btn btn-outline-light dropdown-toggle"
+                type="button"
+                data-bs-toggle="dropdown"
+              >
+                {{ user.username }}
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                  <a class="dropdown-item" href="">Create Deck</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="">My Profile</a>
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <a class="dropdown-item" href="">Logout</a>
+                </li>
+              </ul>
+            </div>
+            {% else %}
+            <a href="" class="btn btn-outline-light me-2">Login</a>
+            <a href="" class="btn btn-primary">Sign Up</a>
+            {% endif %}
+          </div>
         </div>
       </div>
     </nav>
 
-    <div class="container mt-4">{% block content %}{% endblock %}</div>
+    <!-- Main Content -->
+    <main class="py-4">
+      <div class="container">
+        {% if messages %} {% for message in messages %}
+        <div
+          class="alert alert-{{ message.tags }} alert-dismissible fade show"
+          role="alert"
+        >
+          {{ message }}
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+          ></button>
+        </div>
+        {% endfor %} {% endif %} {% block content %}{% endblock %}
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer mt-auto py-3 bg-dark text-light">
+      <div class="container text-center">
+        <span
+          >© 2024 PokéDecks - Built with ❤️ for the Pokémon TCG Community</span
+        >
+      </div>
+    </footer>
 
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    {% block extra_js %}{% endblock %}
+    {% block extra_scripts %}{% endblock %}
   </body>
 </html>

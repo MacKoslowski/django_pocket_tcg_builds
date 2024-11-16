@@ -1,27 +1,52 @@
-{% extends 'base.html' %} {% block title %}Home{% endblock %} {% block content
-%}
-<div class="row">
-  <div class="col-md-8 offset-md-2">
-    <div class="card">
-      <div class="card-body">
-        <h1 class="card-title">Welcome, {{ user.username }}!</h1>
-        <p class="card-text">You've successfully logged in with Discord.</p>
+{% extends 'base.html' %} {% block title %}PokéDecks - Discover Top Pokemon TCG
+Decks{% endblock %} {% block content %}
+<div class="container">
+  <!-- Hero Section -->
+  <div class="py-5 text-center">
+    <h1 class="display-4 fw-bold">Build Better Pokémon Decks</h1>
+    <p class="lead mb-4">
+      Discover winning strategies, share your builds, and track card prices.
+    </p>
+    {% if not user.is_authenticated %}
+    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+      <a href="#" class="btn btn-primary btn-lg px-4 gap-3">Get Started</a>
+      <a href="#" class="btn btn-outline-secondary btn-lg px-4">Browse Decks</a>
+    </div>
+    {% endif %}
+  </div>
 
-        <!-- Example of HTMX usage -->
-        <div
-          hx-get="{% url 'core:home' %}"
-          hx-trigger="click"
-          hx-target="#message-area"
-          class="btn btn-primary"
+  <!-- Trending Decks Section -->
+  <section class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>Trending Decks</h2>
+      <div>
+        <button
+          class="btn btn-sm btn-outline-primary me-2"
+          hx-get="#?format=standard"
+          hx-target="#trending-decks"
+          hx-indicator="#loading"
         >
-          Refresh Content
-        </div>
-
-        <div id="message-area" class="mt-3">
-          <!-- Content will be dynamically updated here -->
-        </div>
+          Standard
+        </button>
+        <button
+          class="btn btn-sm btn-outline-primary"
+          hx-get="#=expanded"
+          hx-target="#trending-decks"
+          hx-indicator="#loading"
+        >
+          Expanded
+        </button>
       </div>
     </div>
-  </div>
+
+    <div id="trending-decks" class="row row-cols-1 row-cols-md-3 g-4">
+      {% include '_trending_decks.html' %}
+    </div>
+    <div id="loading" class="htmx-indicator">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  </section>
 </div>
 {% endblock %}
