@@ -1,0 +1,6 @@
+# requirements.txt
+Django==5.0.1
+python-dotenv==1.0.0
+requests==2.31.0
+django-htmx==1.17.2
+django-allauth==0.60.1

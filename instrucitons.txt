@@ -1,0 +1,6 @@
+py -m venv gamer_rage_env
+cd gamer_rage_env
+scripts\activate
+py -m pip install Django
+python .\manage.py startapp core
+download htmx js and bootstrap css put into static
