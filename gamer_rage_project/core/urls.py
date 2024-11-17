@@ -19,4 +19,7 @@ urlpatterns = [
     path('deck_list/', 
          views.deck_list, 
          name='deck_list'),
+          # ... existing urls ...
+    path('deck/<int:deck_id>/vote/', views.toggle_deck_vote, name='toggle_deck_vote'),
+    path('deck/<int:deck_id>/react/', views.toggle_deck_reaction, name='toggle_deck_reaction'),
 ]

@@ -169,25 +169,38 @@ class DeckCard(models.Model):
         if self.quantity > 4 and self.card.card_type != 'Energy':
             raise ValidationError('You can only have 4 of the same card in a deck')
 
-class Vote(models.Model):
-    class Votes(models.TextChoices):
-        UPVOTE = 'upvote', _('Update')
-        DOWNVOTE = 'downvote', _('Downvote')
-        
-    vote_id = models.AutoField(primary_key=True)
-    deck_id = models.IntegerField()
-    user_id = models.IntegerField()
-    vote_type = models.CharField(choices=Votes.choices, max_length=30)
-    patch_id = models.IntegerField
-    created_at = models.DateTimeField(auto_now_add=True)  # Set once when created
+# core/models.py
+class DeckVote(models.Model):
+    deck = models.ForeignKey(Deck, related_name='votes', on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    value = models.SmallIntegerField(choices=[(-1, 'Downvote'), (1, 'Upvote')])
+    created_at = models.DateTimeField(auto_now_add=True)
 
-class Reaction(models.Model):
+    class Meta:
+        unique_together = ['deck', 'user']  # One vote per user per deck
+
+class DeckReaction(models.Model):
+    EMOJI_CHOICES = [
+        ('⚡', 'Lightning'),
+        ('🔥', 'Fire'),
+        ('🌿', 'Leaf'),
+        ('💧', 'Water'),
+        ('⭐', 'Star'),
+        ('✨', 'Sparkles'),
+        ('💪', 'Strong'),
+        ('🎯', 'Target'),
+        ('❤️', 'Heart'),
+        ('👍', 'Thumbs Up'),
+        ('👎', 'Thumbs Down'),
+        ('🏆', 'Trophy'),
+    ]
     react_id = models.AutoField(primary_key=True)
-    deck_id = models.IntegerField()
-    user_id = models.IntegerField()
-    emoji = models.CharField(max_length=5)
-    patch_id = models.IntegerField()
+    deck = models.ForeignKey(Deck, related_name='reactions', on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    emoji = models.CharField(max_length=5, choices=EMOJI_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)  # Set once when created
+    class Meta:
+        unique_together = ['deck', 'user', 'emoji']  # One of each emoji per user per deck
 
 class Patch(models.Model):
     patch_id = models.AutoField(primary_key=True)

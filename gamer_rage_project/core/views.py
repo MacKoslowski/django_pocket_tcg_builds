@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from .models import Card, Deck, DeckCard, ColorTypes
+from .models import Card, Deck, DeckCard, ColorTypes, DeckReaction, DeckVote
 from django.template.loader import render_to_string
 from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+from django.db.models import Count, Sum
 
 def home(request):
     # Example data for demonstration
@@ -142,3 +144,88 @@ def delete_deck(request, deck_id):
         deck.delete()
         return HttpResponse(status=200)
     return HttpResponse(status=405)
+
+@login_required
+def toggle_deck_vote(request, deck_id):
+    if request.method == 'POST':
+        deck = get_object_or_404(Deck, deck_id=deck_id)
+        vote_value = int(request.POST.get('value'))  # 1 or -1
+        
+        vote, created = DeckVote.objects.get_or_create(
+            deck=deck,
+            user=request.user,
+            defaults={'value': vote_value}
+        )
+        
+        if not created:
+            if vote.value == vote_value:
+                # Remove vote if clicking same button
+                vote.delete()
+            else:
+                # Change vote if clicking different button
+                vote.value = vote_value
+                vote.save()
+        
+        # Get updated counts
+        vote_sum = deck.votes.aggregate(total=Sum('value'))['total'] or 0
+        
+        return JsonResponse({
+            'vote_sum': vote_sum,
+            'user_vote': vote_value if (created or vote.value == vote_value) else 0
+        })
+    
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+@login_required
+def toggle_deck_reaction(request, deck_id):
+    if request.method == 'POST':
+        deck = get_object_or_404(Deck, deck_id=deck_id)
+        emoji = request.POST.get('emoji')
+        
+        # Validate emoji
+        if emoji not in dict(DeckReaction.EMOJI_CHOICES):
+            return JsonResponse({'error': 'Invalid emoji'}, status=400)
+        
+        reaction, created = DeckReaction.objects.get_or_create(
+            deck=deck,
+            user=request.user,
+            emoji=emoji
+        )
+        
+        if not created:
+            # Remove reaction if already exists
+            reaction.delete()
+        
+        # Get updated counts
+        reactions = DeckReaction.objects.filter(deck=deck).values('emoji').annotate(
+            count=Count('id')
+        )
+        
+        return JsonResponse({
+            'reactions': list(reactions),
+            'user_reacted': created
+        })
+    
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+@login_required
+def deck_detail(request, deck_id):
+    deck = get_object_or_404(Deck, deck_id=deck_id)
+    
+    # Get vote info
+    vote_sum = deck.votes.aggregate(total=Sum('value'))['total'] or 0
+    user_vote = deck.votes.filter(user=request.user).values_list('value', flat=True).first()
+    
+    # Get reaction info
+    reactions = deck.reactions.values('emoji').annotate(count=Count('id'))
+    reaction_counts = {r['emoji']: r['count'] for r in reactions}
+    user_reactions = {r.emoji: True for r in deck.reactions.filter(user=request.user)}
+    
+    return render(request, 'deck_detail.html', {
+        'deck': deck,
+        'vote_sum': vote_sum,
+        'user_vote': user_vote,
+        'reaction_counts': reaction_counts,
+        'user_reactions': user_reactions,
+        'reaction_choices': DeckReaction.EMOJI_CHOICES,
+})

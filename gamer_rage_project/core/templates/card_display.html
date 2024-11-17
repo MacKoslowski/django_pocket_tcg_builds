@@ -1,0 +1,39 @@
+<!-- templates/core/components/card_display.html -->
+{% load static %}
+<form class="card h-100 pokemon-card" id="card-{{ card.card_id }}">
+    <div class="card-body p-2 d-flex justify-content-between">
+        <div>
+            <h6 class="card-title mb-0">{{ card.title }}</h6>
+            <small class="text-muted">
+                {{ card.get_type_display }} - {{ card.hp }} HP
+                {% if card.rarity %}
+                    - {{ card.rarity }}
+                {% endif %}
+            </small>
+            
+            <!-- Color Type Badges -->
+            <div class="mt-1">
+                <span class="badge bg-{{ card.color }}">{{ card.get_color_display }}</span>
+            </div>
+        </div>
+
+        {% if show_add_button and deck %}
+        <div class="d-flex align-items-start">
+            <input type="number" 
+                   name="quantity"
+                   class="form-control form-control-sm me-2" 
+                   style="width: 60px"
+                   value="1" 
+                   min="1" 
+                   max="4">
+            <input type="hidden" name="card_id" value="{{ card.card_id }}">
+            <button class="btn btn-sm btn-primary"
+                    hx-post="{% url 'core:add_card_to_deck' deck.deck_id %}"
+                    hx-include="[name='quantity'], [name='card_id']"
+                    hx-target="#deck-cards">
+                Add
+            </button>
+        </div>
+        {% endif %}
+    </div>
+</form>

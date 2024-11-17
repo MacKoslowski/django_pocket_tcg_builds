@@ -1,13 +1,18 @@
 <!-- templates/core/_card_search_results.html -->
+{% load static %}
+{% load core_tags %}
 {% for card in cards %}
-<div class="card mb-2">
+
+<!-- Render a card with add button -->
+{% render_card card show_add_button=True deck=deck %}
+<!--<div class="card mb-2">
     <div class="card-body p-2 d-flex justify-content-between align-items-center">
         <div>
             <h6 class="mb-0">{{ card.title }}</h6>
             <small class="text-muted">{{ card.get_type_display }} - {{ card.hp }} HP</small>
         </div>
         <div class="d-flex align-items-center">
-            {% if deck %}  <!-- Only show quantity and add button if we have a deck -->
+            {% if deck %}  
                 <input type="number" 
                       name = 'quantity'
                        class="form-control form-control-sm me-2" 
@@ -24,7 +29,7 @@
                     Add
                 </button>
             {% else %}
-                <!-- Optional: Add a view/details button when not in deck building mode -->
+                
                 <a href="{% url 'core:card_detail' card.card_id %}" 
                    class="btn btn-sm btn-outline-secondary">
                     View
@@ -32,7 +37,7 @@
             {% endif %}
         </div>
     </div>
-</div>
+</div>-->
 {% empty %}
 <p class="text-muted">No cards found</p>
 {% endfor %}

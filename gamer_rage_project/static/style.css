@@ -21,3 +21,32 @@
 .card:hover {
   transform: translateY(-5px);
 }
+
+/* static/css/components.css */
+.pokemon-card {
+  transition: transform 0.2s ease;
+}
+
+.pokemon-card:hover {
+  transform: translateY(-5px);
+}
+
+.deck-card {
+  transition: all 0.3s ease;
+}
+
+.deck-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+}
+
+.reactions-summary {
+  font-size: 0.875rem;
+}
+
+/* Color badges */
+.badge.bg-grass { background-color: #78C850; }
+.badge.bg-fire { background-color: #F08030; }
+.badge.bg-water { background-color: #6890F0; }
+.badge.bg-lightning { background-color: #F8D030; }
+/* ... add other color classes ... */
