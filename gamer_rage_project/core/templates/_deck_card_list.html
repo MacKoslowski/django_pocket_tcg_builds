@@ -18,7 +18,7 @@
         <td>
           <button
             class="btn btn-sm btn-danger"
-            hx-post="{% url 'remove_card_from_deck' deck.id deck_card.card.id %}"
+            hx-post="{% url 'core:remove_card_from_deck' deck.deck_id deck_card.card.card_id %}"
             hx-target="#deck-cards"
             hx-confirm="Remove this card?"
           >
@@ -26,7 +26,7 @@
           </button>
         </td>
       </tr>
-      {% endfor %}
+      {% endfor %} 
     </tbody>
   </table>
 </div>

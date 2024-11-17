@@ -1,32 +1,37 @@
+<!-- templates/core/_card_search_results.html -->
 {% for card in cards %}
 <div class="card mb-2">
-  <div class="card-body p-2 d-flex justify-content-between align-items-center">
-    <div>
-      <h6 class="mb-0">{{ card.title }}</h6>
-      <small class="text-muted"
-        >{{ card.get_type_display }} - {{ card.hp }} HP</small
-      >
+    <div class="card-body p-2 d-flex justify-content-between align-items-center">
+        <div>
+            <h6 class="mb-0">{{ card.title }}</h6>
+            <small class="text-muted">{{ card.get_type_display }} - {{ card.hp }} HP</small>
+        </div>
+        <div class="d-flex align-items-center">
+            {% if deck %}  <!-- Only show quantity and add button if we have a deck -->
+                <input type="number" 
+                      name = 'quantity'
+                       class="form-control form-control-sm me-2" 
+                       style="width: 60px"
+                       value="1" 
+                       min="1" 
+                       max="4"
+                       id="quantity-{{ card.card_id }}">
+                <button class="btn btn-sm btn-primary"
+                        hx-post="{% url 'core:add_card_to_deck' deck.deck_id %}"
+                        hx-include="[name='quantity']"
+                        hx-vals='{"card_id": "{{ card.card_id }}"}'
+                        hx-target="#deck-cards">
+                    Add
+                </button>
+            {% else %}
+                <!-- Optional: Add a view/details button when not in deck building mode -->
+                <a href="{% url 'core:card_detail' card.card_id %}" 
+                   class="btn btn-sm btn-outline-secondary">
+                    View
+                </a>
+            {% endif %}
+        </div>
     </div>
-    <div class="d-flex align-items-center">
-      <input
-        type="number"
-        class="form-control form-control-sm me-2"
-        style="width: 60px"
-        value="1"
-        min="1"
-        max="4"
-        id="quantity-{{ card.id }}"
-      />
-      <button
-        class="btn btn-sm btn-primary"
-        hx-post="{% url 'core:add_card_to_deck' deck.deck_id %}"
-        hx-vals='{"card_id": "{{ card.id }}", "quantity": "#quantity-{{ card.id }}"}'
-        hx-target="#deck-cards"
-      >
-        Add
-      </button>
-    </div>
-  </div>
 </div>
 {% empty %}
 <p class="text-muted">No cards found</p>

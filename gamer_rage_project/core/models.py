@@ -114,12 +114,29 @@ class Deck(models.Model):
     public = models.BooleanField(default=False)
     modified_at = models.DateTimeField(auto_now=True)     # Updates on every save
     flagged = models.BooleanField(default=False)
+    cover_card = models.ForeignKey(
+        Card,
+        on_delete=models.SET_NULL,  # If the card is deleted, don't delete the deck
+        null=True,  # Allow deck to exist without cover card
+        blank=True,  # Allow form submission without cover card
+        related_name='cover_for_decks'  # Access decks where this card is the cover
+    )
     # ManyToMany relationship with Card through DeckCard
     cards = models.ManyToManyField(Card, through='DeckCard')
     
     def __str__(self):
         return self.user_title
     
+    def get_cover_card(self):
+        """Returns cover card if set, otherwise returns first card in deck"""
+        if self.cover_card:
+            return self.cover_card
+        # Get first Pokemon card in deck as fallback
+        first_card = self.deckcards.filter(
+            card__type__in=['basic', 'stage_1', 'stage_2']
+        ).first()
+        return first_card.card if first_card else None
+        
     @property
     def card_count(self):
         return self.deckcards.aggregate(

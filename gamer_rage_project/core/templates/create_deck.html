@@ -2,7 +2,7 @@
 <div class="container py-4">
   <div class="row">
     <!-- Left Column: Deck Details -->
-    <div class="col-md-4">
+    <div class="col-md-12">
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">Create New Deck</h5>
@@ -78,35 +78,6 @@
               >
             </div>
           </form>
-        </div>
-      </div>
-
-      <!-- Card Search -->
-      <div class="card mt-3">
-        <div class="card-body">
-          <h5 class="card-title">Search Cards</h5>
-          <input
-            type="text"
-            class="form-control"
-            placeholder="Search cards..."
-            hx-get="{% url 'core:search_cards' %}"
-            hx-trigger="keyup changed delay:500ms"
-            hx-target="#search-results"
-          />
-          <div id="search-results" class="mt-3"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Right Column: Current Deck -->
-    <div class="col-md-8">
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">Current Deck</h5>
-          <div id="deck-cards">
-            <!-- Cards will be loaded here -->
-            {% include '_deck_card_list.html' %}
-          </div>
         </div>
       </div>
     </div>
