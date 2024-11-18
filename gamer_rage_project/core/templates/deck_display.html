@@ -1,10 +1,10 @@
+{% load static %}
+{% load core_tags %}
+
 <!-- templates/core/components/deck_display.html -->
-<div class="card h-100 deck-card" id="deck-{{ deck.deck_id }}">
+<div class="card h-100 deck-card" id="deck-{{ deck.deck_id }}" href="{ url core:deck_detail}">
     {% if deck.cover_card %}
-    <img src="{{ deck.cover_card.image_url }}" 
-         class="card-img-top" 
-         alt="{{ deck.user_title }}"
-         style="object-fit: cover; height: 200px;">
+        {% render_card deck.cover_card show_add_button=False deck=deck %}
     {% endif %}
     
     <div class="card-body">
@@ -34,8 +34,10 @@
                 {{ deck.votes.all|length }}
             </span>
             
-            <!-- Top reactions 
-          -->
+              <!-- Top reactions -->
+              {% for reaction in top_reactions %}
+                    <span class="me-2">{{ reaction.emoji }} {{ reaction.count }}</span>
+                {% endfor %}
         </div>
     </div>
 
@@ -48,5 +50,6 @@
                 {{ deck.modified_at|timesince }} ago
             </small>
         </div>
+        <a href="{% url 'core:deck_detail' deck.deck_id %}" class="btn btn-sm btn-primary">View</a>
     </div>
 </div>

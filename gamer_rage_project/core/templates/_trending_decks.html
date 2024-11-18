@@ -1,34 +1,8 @@
+{% load static %}
+{% load core_tags %}
 {% for deck in trending_decks %}
 <div class="col">
-  <div class="card h-100">
-    {% if deck.cover_card %}
-    <img
-      src="{{ deck.cover_card.image_url }}"
-      class="card-img-top"
-      alt="{{ deck.cover_card.name }}"
-    />
-    {% endif %}
-    <div class="card-body">
-      <h5 class="card-title">{{ deck.title }}</h5>
-      <p class="card-text text-muted">{{ deck.format|title }}</p>
-      <p class="card-text">{{ deck.description|truncatechars:100 }}</p>
-    </div>
-    <div class="card-footer bg-transparent">
-      <div class="d-flex justify-content-between align-items-center">
-        <small class="text-muted">by {{ deck.creator.username }}</small>
-        <div>
-          <button
-            class="btn btn-sm btn-outline-primary me-2"
-            hx-post="#"
-            hx-vals='{"deck_id": "{{ deck.id }}"}'
-            hx-swap="outerHTML"
-          >
-            ❤️ {{ deck.upvote_count }}
-          </button>
-          <a href="#" class="btn btn-sm btn-primary">View</a>
-        </div>
-      </div>
-    </div>
-  </div>
+  {% render_deck deck %}
+  
 </div>
 {% endfor %}

@@ -161,7 +161,7 @@ class DeckCard(models.Model):
         unique_together = ('deck', 'card')  # Prevent duplicate cards in deck
         
     def __str__(self):
-        return f"{self.quantity}x {self.card.name} in {self.deck.title}"
+        return f"{self.quantity}x {self.card.title} in {self.deck.user_title}"
 
     def clean(self):
         from django.core.exceptions import ValidationError

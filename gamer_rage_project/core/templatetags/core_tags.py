@@ -15,7 +15,13 @@ def render_card(card, show_add_button=False, deck=None):
 
 @register.inclusion_tag('deck_display.html')
 def render_deck(deck, show_full_reactions=False):
+    # Get top 3 reactions here instead of in template
+    top_reactions = deck.reactions.values('emoji').annotate(
+        count=Count('emoji')
+    ).order_by('-count')[:3]
+
     return {
         'deck': deck,
-        'show_full_reactions': show_full_reactions
+        'show_full_reactions': show_full_reactions,
+        'top_reactions': top_reactions
     }
