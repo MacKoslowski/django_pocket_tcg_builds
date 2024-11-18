@@ -17,8 +17,15 @@ Including another URLconf
 # urls.py
 from django.contrib import admin
 from django.urls import path, include
+from django.shortcuts import redirect
+from allauth.socialaccount.providers.discord.views import oauth2_login
+
+def discord_login(request):
+    return redirect(oauth2_login(request))
+
 
 urlpatterns = [
+    #path('accounts/discord/login/', discord_login, name='discord_login'),
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
     path('', include('core.urls')),

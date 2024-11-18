@@ -18,18 +18,20 @@
   </head>
   <body class="bg-light" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg bg-light">
+    <nav class="navbar navbar-expand-lg nabar-light bg-light">
       <div class="container">
           <a class="navbar-brand" href="{% url 'core:home' %}">Pocket Builds</a>
           
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-nav">
-              <span class="navbar-toggler-icon"></span>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+            <span class="navbar-toggler-icon"></span>
           </button>
+            
           
-        
+          <div class="collapse navbar-collapse" id="navbarContent">
             <!-- Auth Header Component -->
             {% include '_auth_header.html' %}
-          
+          </div>
+            
       </div>
   </nav>
 

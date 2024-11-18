@@ -48,25 +48,45 @@
                              alt="{{ card.title }}">
                     </div>
                     <div class="col-md-6">
-                        <dl>
-                            <dt>Type</dt>
-                            <dd>{{ card.get_type_display }}</dd>
- 
-                            <dt>HP</dt>
-                            <dd>{{ card.hp }}</dd>
- 
-                            <dt>Color</dt>
-                            <dd>
-                                <span class="badge bg-{{ card.color }}">
-                                    {{ card.get_color_display }}
-                                </span>
-                            </dd>
- 
-                            {% if card.rarity %}
-                            <dt>Rarity</dt>
-                            <dd>{{ card.rarity }}</dd>
-                            {% endif %}
-                        </dl>
+                        <table class="table table-small">
+                            <thead class="thead">
+                                <tr>
+                                    <th>
+                                        Type
+                                    </th>
+                                    <th>
+                                        Hp
+                                    </th>
+                                    <th>
+                                        Color
+                                    </th>
+                                    <th>
+                                        Rarity
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <td>
+                                    {{ card.get_type_display }}
+                                </td>
+                                <td>
+                                    {{ card.hp }}
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ card.color }}">
+                                        {{ card.get_color_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if card.rarity %}
+                            
+                                    {{ card.rarity }}
+                                    {% endif %}
+                                </td>
+                                
+                            </tbody>
+                        </table>
+                           
                     </div>
                 </div>
             </div>
