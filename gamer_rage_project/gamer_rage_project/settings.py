@@ -64,7 +64,7 @@ AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
 AWS_S3_OBJECT_PARAMETERS = {
    'CacheControl': 'max-age=86400',
 }
-
+OPENAI_API_KEY=os.getenv('OPENAI_API_KEY')
 # SECURITY WARNING: keep the secret key used in production secret!
 CLIENT_ID = os.environ.get("client_id")
 DISCORD_SECRET = os.environ.get('client_secret')

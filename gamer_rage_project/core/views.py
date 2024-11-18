@@ -6,13 +6,15 @@ from django.template.loader import render_to_string
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 from django.db.models import Count, Sum
-
+from openai import OpenAI
+import os
+OpenAI.api_key = os.getenv('OPENAI_API_KEY')
 def home(request):
     # Example data for demonstration
     #trending_decks = Deck.objects.annotate(
     #    upvote_count=Count('upvotes')
     #).order_by('-upvote_count')[:6]
-    decks = Deck.objects.all()#\
+    decks = Deck.objects.filter(public=1)
     return render(request, 'home.html', {
         'trending_decks': decks
     })
@@ -35,23 +37,43 @@ def deck_list(request):
         'decks': decks
     })
 
-#@login_required
+
+
+@login_required
 def create_deck(request):
-    if request.method == 'POST':
-        # Create the deck first
-        deck = Deck.objects.create(
-            user_title=request.POST.get('title'),
-            user_description=request.POST.get('description'),
-            color_1=request.POST.get('primary_color'),
-            color_2=request.POST.get('secondary_color') or None,
-            creator=request.user
-        )
-        # Redirect to deck building page
-        return redirect('core:build_deck', deck_id=deck.deck_id)
-    
-    return render(request, 'create_deck.html', {
-        'color_types': ColorTypes.choices
-    })
+   if request.method == 'POST':
+       title = request.POST.get('title')
+       description = request.POST.get('description')
+
+       # Check content with OpenAI moderation
+       try:
+           client = OpenAI()
+           moderation = client.moderations.create(
+               model="omni-moderation-latest",
+               input=[title, description]
+           )
+           print(moderation.results[0])
+           if moderation.results[0].flagged:
+               return JsonResponse({
+                   'error': 'Content contains inappropriate language'
+               }, status=400)
+
+       except Exception as e:
+           # Log the error but allow creation to continue
+           print(f"Moderation API error: {str(e)}")
+
+       deck = Deck.objects.create(
+           user_title=title,
+           user_description=description,
+           color_1=request.POST.get('primary_color'),
+           color_2=request.POST.get('secondary_color') or None,
+           creator=request.user
+       )
+       return redirect('core:build_deck', deck_id=deck.deck_id)
+  
+   return render(request, 'create_deck.html', {
+       'color_types': ColorTypes.choices
+   })
 
 def build_deck(request, deck_id):
     deck = get_object_or_404(Deck, deck_id=deck_id, creator=request.user)
