@@ -47,6 +47,12 @@ class Card(models.Model):
     description = models.CharField(max_length=30)
     weakness_type = models.CharField(choices=ColorTypes.choices, max_length=30)
     weakness_dmg = models.IntegerField
+    image_key = models.CharField(max_length=200)  # Store S3 key
+
+    @property
+    def image_url(self):
+       return f'https://{settings.AWS_S3_CUSTOM_DOMAIN}/{self.image_key}'
+    
     def __str__(self):
         return f"{self.title}"
     

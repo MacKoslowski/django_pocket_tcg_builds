@@ -18,7 +18,7 @@ def home(request):
     })
 
 def trending_decks(request):
-    decks = Deck.objects.all()#\
+    decks = Deck.objects.filter(public=1)#\
         #.annotate(upvote_count=sum('upvotes'))\
         #.order_by('-upvote_count')[:6]
     
@@ -191,10 +191,21 @@ def toggle_deck_vote(request, deck_id):
         
         # Get updated counts
         vote_sum = deck.votes.aggregate(total=Sum('value'))['total'] or 0
+        user_reaction = DeckReaction.objects.filter(deck=deck,
+            user=request.user).first()
+            
+        reactions = DeckReaction.objects.filter(deck=deck).values('emoji').annotate(
+            count=Count('deck_id')
+        )
+        reaction_counts = {r['emoji']: r['count'] for r in reactions}
         return render(request, '_deck_vote.html', {
             'deck': deck,
             'vote_sum': vote_sum,
-            'user_vote': vote_value if (created or vote.value == vote_value) else 0
+            'user_vote': vote_value if (created or vote.value == vote_value) else 0,
+            'reactions': list(reactions),
+            'user_reaction': user_reaction,
+            'reaction_counts': reaction_counts,
+            'reaction_choices': DeckReaction.EMOJI_CHOICES,
         })
     
     elif request.methd == 'GET':

@@ -1,6 +1,10 @@
-<!-- templates/core/components/card_display.html -->
-{% load static %}
 <form class="card h-100 pmon-card" id="card-{{ card.card_id }}">
+    {% if card.image_key %}
+    <img src="{{ card.image_url }}" 
+         class="card-img-top" 
+         alt="{{ card.title }}"
+         loading="lazy">
+    {% endif %}
     <div class="card-body p-2 d-flex justify-content-between">
         <div>
             <h6 class="card-title mb-0">{{ card.title }}</h6>
@@ -10,21 +14,19 @@
                     - {{ card.rarity }}
                 {% endif %}
             </small>
-            
-            <!-- Color Type Badges -->
+           
             <div class="mt-1">
                 <span class="badge bg-{{ card.color }}">{{ card.get_color_display }}</span>
             </div>
         </div>
-
         {% if show_add_button and deck %}
         <div class="d-flex align-items-start">
-            <input type="number" 
+            <input type="number"
                    name="quantity"
-                   class="form-control form-control-sm me-2" 
+                   class="form-control form-control-sm me-2"
                    style="width: 60px"
-                   value="1" 
-                   min="1" 
+                   value="1"
+                   min="1"
                    max="4">
             <input type="hidden" name="card_id" value="{{ card.card_id }}">
             <button class="btn btn-sm btn-primary"
@@ -36,4 +38,4 @@
         </div>
         {% endif %}
     </div>
-</form>
+ </form>

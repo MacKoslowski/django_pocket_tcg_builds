@@ -25,8 +25,8 @@
 /* static/css/components.css */
 .pmon-card {
   transition: transform 0.2s ease;
-  height: 17.6rem !important;
-  width: 13.2rem;
+  /*height: 17.6rem !important;
+  width: 13.2rem;*/
 }
 
 .pmon-card:hover {
