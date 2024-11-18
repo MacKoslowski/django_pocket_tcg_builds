@@ -84,6 +84,7 @@ def create_deck(request):
        'color_types': ColorTypes.choices
    })
 
+@login_required
 def build_deck(request, deck_id):
     deck = get_object_or_404(Deck, deck_id=deck_id, creator=request.user)
     search_cards = Card.objects.all()[:10]
@@ -106,21 +107,6 @@ def update_secondary_color(request):
     })
 
 
-#@login_required
-def vote(request):
-    if request.method == 'POST':
-        vote_type = request.POST.get('value')
-        deck_id = request.POST.get('deck_id')
-        user = request.auth.user
-    query = request.GET.get('search', '')
-    cards = Card.objects.filter(title__icontains=query)[:10]
-    html = render_to_string(
-        '_card_search_results.html', 
-        {'cards': cards},
-        request=request
-    )
-    return HttpResponse(html)
-
 def search_cards(request):
     query = request.GET.get('search', '')
     deck_id = request.GET.get('deck_id')  # This will be None if not provided
@@ -141,7 +127,7 @@ def search_cards(request):
     })
 
 
-#@login_required
+@login_required
 def add_card_to_deck(request, deck_id):
     if request.method == 'POST':
         deck = Deck.objects.get(deck_id=deck_id)
@@ -159,7 +145,7 @@ def add_card_to_deck(request, deck_id):
             
         return render(request, '_deck_card_list.html', {'deck': deck})
 
-#@login_required
+@login_required
 def remove_card_from_deck(request, deck_id, card_id):
     if request.method == 'POST':
         DeckCard.objects.filter(deck_id=deck_id, card_id=card_id).delete()
@@ -167,7 +153,7 @@ def remove_card_from_deck(request, deck_id, card_id):
         return render(request, '_deck_card_list.html', {'deck': deck})
     
 
-#@login_required
+@login_required
 def toggle_deck_visibility(request, deck_id):
     if request.method == 'POST':
         deck = get_object_or_404(Deck, deck_id=deck_id, creator=request.user)
@@ -176,7 +162,7 @@ def toggle_deck_visibility(request, deck_id):
         return HttpResponse(status=200)
     return HttpResponse(status=405)
 
-#@login_required
+@login_required
 def delete_deck(request, deck_id):
     if request.method == 'DELETE':
         deck = get_object_or_404(Deck, deck_id=deck_id, creator=request.user)
@@ -242,7 +228,6 @@ def toggle_deck_vote(request, deck_id):
             'user_vote': vote.value
         })
 
-
 @login_required
 def toggle_deck_reaction(request, deck_id):
     if request.method == 'POST':
@@ -253,21 +238,30 @@ def toggle_deck_reaction(request, deck_id):
         if emoji not in dict(DeckReaction.EMOJI_CHOICES):
             return JsonResponse({'error': 'Invalid emoji'}, status=400)
         
-        reaction, created = DeckReaction.objects.get_or_create(
+        # Get existing reaction for this user/deck if any
+        existing_reaction = DeckReaction.objects.filter(
             deck=deck,
-            user=request.user,
-            emoji=emoji
-        )
-        
-        if not created:
-            if reaction.emoji == emoji:
-                # Remove vote if clicking same button
-                reaction.delete()
+            user=request.user
+        ).first()
+
+        if existing_reaction:
+            if existing_reaction.emoji == emoji:
+                # Remove if same emoji clicked
+                existing_reaction.delete()
+                user_reaction = None
             else:
-                # Change vote if clicking different button
-                reaction.emoji = emoji
-                reaction.save()
-        
+                # Update to new emoji
+                existing_reaction.emoji = emoji
+                existing_reaction.save()
+                user_reaction = existing_reaction
+        else:
+            # Create new reaction
+            user_reaction = DeckReaction.objects.create(
+                deck=deck,
+                user=request.user,
+                emoji=emoji
+            )
+
         # Get updated counts
         reactions = DeckReaction.objects.filter(deck=deck).values('emoji').annotate(
             count=Count('deck_id')
@@ -275,25 +269,14 @@ def toggle_deck_reaction(request, deck_id):
         reaction_counts = {r['emoji']: r['count'] for r in reactions}
         return render(request, '_deck_reactions.html', {
             'reactions': list(reactions),
-            'user_reaction': reaction,
+            'user_reaction': user_reaction,
             'reaction_counts': reaction_counts,
             'reaction_choices': DeckReaction.EMOJI_CHOICES,
             'deck': deck
         })
+
+    return HttpResponse(status=405)
     
-    # elif request.method == 'GET':
-    #     user_reaction = DeckReaction.objects.filter(deck=deck,
-    #         user=request.user).first()
-            
-    #     reactions = DeckReaction.objects.filter(deck=deck).values('emoji').annotate(
-    #         count=Count('deck_id')
-    #     )
-    #     reaction_counts = {r['emoji']: r['count'] for r in reactions}
-    #     return render(request, '_deck_reactions.html', {
-    #         'reactions': list(reactions),
-    #         'user_reacted': created,
-    #         'reaction_counts': reaction_counts
-    #     })
     
 def deck_detail(request, deck_id):
     deck = get_object_or_404(Deck, deck_id=deck_id)

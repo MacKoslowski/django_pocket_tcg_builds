@@ -57,8 +57,10 @@
             <!-- Cards Grid -->
             <div class="row row-cols-1 row-cols-md-4 g-4">
                 {% for deck_card in deck_cards %}
-
-                 {% render_card card=deck_card.card show_add_button=False deck=deck %}
+                <div class="col">
+                    {% render_card card=deck_card.card show_add_button=False deck=deck %}
+                </div>
+                 
                 {% endfor %}
             </div>
         </div>

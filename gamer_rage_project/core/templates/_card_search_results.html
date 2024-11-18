@@ -3,7 +3,7 @@
 {% load core_tags %}
 <div class="row row-cols-3 g-2">
     {% for card in cards %}
-    <div class="col">
+    <div class="col" style="  margin-left: 2px; margin-right: 2px;">
         {% render_card card show_add_button=True deck=deck %}
     </div>
     {% empty %}
