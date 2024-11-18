@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.discord',
     #mine 
-    'core'
+    'core',
+    'fontawesomefree'
 ]
 SITE_ID = 1
 # Auth Settings

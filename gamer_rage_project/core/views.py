@@ -37,6 +37,14 @@ def deck_list(request):
         'decks': decks
     })
 
+@login_required
+def toggle_deck_public(request, deck_id):
+    if request.method == 'POST':
+        deck = get_object_or_404(Deck, deck_id=deck_id, creator=request.user)
+        deck.public = not deck.public
+        deck.save()
+        return HttpResponse(status=200)
+    return HttpResponse(status=405)
 
 
 @login_required

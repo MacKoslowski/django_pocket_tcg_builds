@@ -22,6 +22,7 @@ urlpatterns = [
     path('deck_list/', 
          views.deck_list, 
          name='deck_list'),
+     path('deck/<int:deck_id>/toggle-public/', views.toggle_deck_public, name='toggle_deck_public'),
           # ... existing urls ...
     
 ]
