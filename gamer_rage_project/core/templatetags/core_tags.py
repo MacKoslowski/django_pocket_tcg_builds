@@ -6,7 +6,7 @@ register = template.Library()
 
 @register.inclusion_tag('card_display.html')
 def render_card(card, show_add_button=False, deck=None):
-    print(card, show_add_button, deck)
+    
     return {
         'card': card,
         'show_add_button': show_add_button,
@@ -14,7 +14,7 @@ def render_card(card, show_add_button=False, deck=None):
     }
 
 @register.inclusion_tag('deck_display.html')
-def render_deck(deck, show_full_reactions=False):
+def render_deck(deck, show_edit_button=False, show_full_reactions=False):
     # Get top 3 reactions here instead of in template
     top_reactions = deck.reactions.values('emoji').annotate(
         count=Count('emoji')
@@ -22,6 +22,7 @@ def render_deck(deck, show_full_reactions=False):
 
     return {
         'deck': deck,
+        'show_edit_button': show_edit_button,
         'show_full_reactions': show_full_reactions,
         'top_reactions': top_reactions
     }

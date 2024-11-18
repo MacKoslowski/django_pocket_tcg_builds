@@ -5,17 +5,24 @@
 
 <div class="container py-4">
     <!-- Deck Header -->
+    <!-- Deck Header -->
     <div class="row mb-4">
         <div class="col-md-8">
-            <h1>{{ deck.user_title }}</h1>
-            <p class="text-muted">
-                Created by {{ deck.creator.username }} · 
+            <!-- Title and Report Button -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h1>{{ deck.user_title }}</h1>
+                {% include '_report_button.html' %}
+            </div>
+
+            <!-- Creator and Date -->
+            <p class="text-muted mb-3">
+                Created by {{ deck.creator.username }} ·
                 {{ deck.created_at|date:"F j, Y" }}
             </p>
-            <p>{{ deck.user_description }}</p>
-            {% if deck.cover_card %}
-                {% render_card deck.cover_card show_add_button=False deck=deck %}
-            {% endif %}
+
+            <!-- Description -->
+            <p class="mb-3">{{ deck.user_description }}</p>
+
             <!-- Color Tags -->
             <div class="mb-3">
                 <span class="badge bg-{{ deck.color_1 }}">{{ deck.get_color_1_display }}</span>
@@ -23,25 +30,29 @@
                     <span class="badge bg-{{ deck.color_2 }}">{{ deck.get_color_2_display }}</span>
                 {% endif %}
             </div>
+
+            <!-- Deck Vote -->
+            {% include '_deck_vote.html' %}
         </div>
+
         
-        <div class="col-md-4">
-           {% include '_deck_vote.html' %}
+           
+        
+
+        <div class="col-md-2">
+            <h5>Cover Card</h5>
+             
+            {% if deck.cover_card %}
+                {% render_card deck.cover_card show_add_button=False deck=deck %}
+            {% endif %}
         </div>
     </div>
-
     <!-- Cards Section -->
-    <div class="row">
+    <div class="row" class="mt-3">
         <div class="col-12">
             <h2 class="mb-3">Cards ({{ deck_cards.count }})</h2>
             
-            <!-- Card Type Filters -->
-            <div class="mb-4">
-                <button class="btn btn-outline-primary active" onclick="filterCards('all')">All</button>
-                <button class="btn btn-outline-primary" onclick="filterCards('pokemon')">Pokémon</button>
-                <button class="btn btn-outline-primary" onclick="filterCards('trainer')">Trainer</button>
-                <button class="btn btn-outline-primary" onclick="filterCards('energy')">Energy</button>
-            </div>
+       
             
             <!-- Cards Grid -->
             <div class="row row-cols-1 row-cols-md-4 g-4">

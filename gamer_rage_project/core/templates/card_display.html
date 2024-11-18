@@ -1,41 +1,104 @@
+<!-- templates/core/components/card_display.html -->
 <form class="card h-100 pmon-card" id="card-{{ card.card_id }}">
     {% if card.image_key %}
     <img src="{{ card.image_url }}" 
          class="card-img-top" 
          alt="{{ card.title }}"
-         loading="lazy">
+         loading="lazy"
+         style="cursor: pointer;"
+         data-bs-toggle="modal" 
+         data-bs-target="#cardModal-{{ card.card_id }}">
     {% endif %}
-    <div class="card-body p-2 d-flex justify-content-between">
-        <div>
-            <h6 class="card-title mb-0">{{ card.title }}</h6>
-            <small class="text-muted">
-                {{ card.get_type_display }} - {{ card.hp }} HP
-                {% if card.rarity %}
-                    - {{ card.rarity }}
-                {% endif %}
-            </small>
-           
-            <div class="mt-1">
-                <span class="badge bg-{{ card.color }}">{{ card.get_color_display }}</span>
-            </div>
-        </div>
-        {% if show_add_button and deck %}
-        <div class="d-flex align-items-start">
+    
+    {% if show_add_button and deck %}
+    <div class="card-footer p-1 bg-white">
+        <div class="d-flex align-items-center">
             <input type="number"
                    name="quantity"
-                   class="form-control form-control-sm me-2"
-                   style="width: 60px"
+                   class=""
+                   style="width: 40px"
                    value="1"
                    min="1"
                    max="4">
             <input type="hidden" name="card_id" value="{{ card.card_id }}">
-            <button class="btn btn-sm btn-primary"
+            <button class="btn btn-sm btn-primary flex-grow-1"
                     hx-post="{% url 'core:add_card_to_deck' deck.deck_id %}"
                     hx-include="[name='quantity'], [name='card_id']"
                     hx-target="#deck-cards">
                 Add
             </button>
         </div>
-        {% endif %}
     </div>
+    {% endif %}
  </form>
+ 
+ <!-- Modal -->
+ <div class="modal fade" id="cardModal-{{ card.card_id }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ card.title }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <img src="{{ card.image_url }}" 
+                             class="img-fluid" 
+                             alt="{{ card.title }}">
+                    </div>
+                    <div class="col-md-6">
+                        <dl>
+                            <dt>Type</dt>
+                            <dd>{{ card.get_type_display }}</dd>
+ 
+                            <dt>HP</dt>
+                            <dd>{{ card.hp }}</dd>
+ 
+                            <dt>Color</dt>
+                            <dd>
+                                <span class="badge bg-{{ card.color }}">
+                                    {{ card.get_color_display }}
+                                </span>
+                            </dd>
+ 
+                            {% if card.rarity %}
+                            <dt>Rarity</dt>
+                            <dd>{{ card.rarity }}</dd>
+                            {% endif %}
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+ </div>
+ 
+ <style>
+ .pmon-card img {
+    max-height: 200px;
+    object-fit: contain;
+ }
+ 
+ .pmon-card {
+    border: none;
+    transition: transform 0.2s;
+ }
+ 
+ .pmon-card:hover {
+    transform: translateY(-5px);
+ }
+ 
+ dl {
+    margin-bottom: 0;
+ }
+ 
+ dt {
+    font-weight: bold;
+    margin-top: 0.5rem;
+ }
+ 
+ dd {
+    margin-left: 1rem;
+ }
+ </style>

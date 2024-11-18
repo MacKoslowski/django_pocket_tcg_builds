@@ -2,7 +2,7 @@
 {% load core_tags %}
 {% for deck in trending_decks %}
 <div class="col">
-  {% render_deck deck %}
+  {% render_deck deck show_edit_button=False %}
   
 </div>
 {% endfor %}

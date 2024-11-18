@@ -3,7 +3,7 @@
 {% load core_tags %}
 
 <!-- templates/core/components/_auth_header.html -->
-<div class="auth-header">
+<div class="auth-header collapse" id="navbar-nav">
     {% if user.is_authenticated %}
         <div class="d-flex align-items-center gap-3">
             <a href="{% url 'core:deck_list' %}" class="text-dark text-decoration-none">

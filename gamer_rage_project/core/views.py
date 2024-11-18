@@ -1,12 +1,13 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from .models import Card, Deck, DeckCard, ColorTypes, DeckReaction, DeckVote
+from .models import Card, Deck, DeckCard, ColorTypes, DeckReaction, DeckVote, Report
 from django.template.loader import render_to_string
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 from django.db.models import Count, Sum
 from openai import OpenAI
+from django.contrib import messages
 import os
 OpenAI.api_key = os.getenv('OPENAI_API_KEY')
 def home(request):
@@ -58,7 +59,7 @@ def create_deck(request):
            client = OpenAI()
            moderation = client.moderations.create(
                model="omni-moderation-latest",
-               input=[title, description]
+               input=f"title:{title}, description:{description}"
            )
            print(moderation.results[0])
            if moderation.results[0].flagged:
@@ -85,8 +86,10 @@ def create_deck(request):
 
 def build_deck(request, deck_id):
     deck = get_object_or_404(Deck, deck_id=deck_id, creator=request.user)
-    return render(request, 'build_deck.html', {
-        'deck': deck
+    search_cards = Card.objects.all()[:10]
+    return render(request, 'edit_deck.html', {
+        'deck': deck,
+        'cards': search_cards
     })
 
 def update_secondary_color(request):
@@ -102,16 +105,6 @@ def update_secondary_color(request):
         'color_types': color_types
     })
 
-#@login_required
-def search_cards(request):
-    query = request.GET.get('search', '')
-    cards = Card.objects.filter(title__icontains=query)[:10]
-    html = render_to_string(
-        '_card_search_results.html', 
-        {'cards': cards},
-        request=request
-    )
-    return HttpResponse(html)
 
 #@login_required
 def vote(request):
@@ -319,7 +312,6 @@ def deck_detail(request, deck_id):
     user_reaction = DeckReaction.objects.filter(deck=deck,
              user=request.user).first()
     
-    print(deck_cards)
     context = {
         'deck': deck,
         'deck_cards': deck_cards,
@@ -328,6 +320,36 @@ def deck_detail(request, deck_id):
         'reaction_counts': reaction_counts,
         'user_reactions': user_reaction,
         'reaction_choices': DeckReaction.EMOJI_CHOICES,
+         'report_reasons': Report.ReportReason.choices,
     }
     
     return render(request, 'deck_detail.html', context)
+
+
+@login_required
+def report_deck(request, deck_id):
+    if request.method == 'POST':
+        deck = get_object_or_404(Deck, deck_id=deck_id)
+        
+        # Don't allow reporting your own deck
+        #if deck.creator == request.user:
+        #    return HttpResponse(status=403)
+            
+        # Check if user already reported this deck
+        if Report.objects.filter(deck=deck, reporter=request.user, status=Report.ReportStatus.PENDING).exists():
+            messages.warning(request, 'You have already reported this deck')
+            return HttpResponse(status=400)
+            
+        Report.objects.create(
+            deck=deck,
+            reporter=request.user,
+            reason=request.POST.get('reason'),
+            details=request.POST.get('details')
+        )
+        deck.public = 0
+        deck.save()
+        
+        messages.success(request, 'Thank you for your report. Our moderators will review it.')
+        return HttpResponse(status=200)
+        
+    return HttpResponse(status=405)
