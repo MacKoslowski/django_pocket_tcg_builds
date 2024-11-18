@@ -23,11 +23,13 @@
 }
 
 /* static/css/components.css */
-.pokemon-card {
+.pmon-card {
   transition: transform 0.2s ease;
+  height: 17.6rem !important;
+  width: 13.2rem;
 }
 
-.pokemon-card:hover {
+.pmon-card:hover {
   transform: translateY(-5px);
 }
 

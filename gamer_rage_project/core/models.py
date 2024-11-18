@@ -22,8 +22,19 @@ class CardTypes(models.TextChoices):
     STAGE1 = 'stage_1'
     STAGE2 = 'stage_2'
 
+
 class Card(models.Model):
-    
+    RARITY_ORDER = {
+        '☆☆☆☆': 1,  # Adjust these values and names
+        '☆☆☆': 2,   # to match your actual
+        '☆☆': 3,     # rarity system
+        '☆': 4,
+        '◊◊◊◊': 5, 
+        '◊◊◊': 6, 
+        '◊◊': 7, 
+        '◊': 8, 
+        '': 9, 
+    }
     card_id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=45)
     hp = models.IntegerField()
@@ -127,15 +138,36 @@ class Deck(models.Model):
     def __str__(self):
         return self.user_title
     
-    def get_cover_card(self):
-        """Returns cover card if set, otherwise returns first card in deck"""
-        if self.cover_card:
-            return self.cover_card
-        # Get first Pokemon card in deck as fallback
-        first_card = self.deckcards.filter(
-            card__type__in=['basic', 'stage_1', 'stage_2']
-        ).first()
-        return first_card.card if first_card else None
+    def set_highest_rarity_cover(self):
+        """Set the cover card to the highest rarity card in the deck"""
+        highest_rarity_card = (
+            self.deckcards.select_related('card')
+            .exclude(card__type__in=['item', 'supporter'])  # Optionally exclude trainer cards
+            .annotate(
+                rarity_order=models.Case(
+                    *[
+                        models.When(card__rarity=rarity, then=models.Value(order))
+                        for rarity, order in Card.RARITY_ORDER.items()
+                    ],
+                    default=models.Value(999),
+                    output_field=models.IntegerField(),
+                )
+            )
+            .order_by('rarity_order')  # Lower number = higher rarity
+            .first()
+        )
+
+        if highest_rarity_card:
+            self.cover_card = highest_rarity_card.card
+            self.save(update_fields=['cover_card'])
+
+    def save(self, *args, **kwargs):
+        # First save to ensure we have an ID
+        super().save(*args, **kwargs)
+        
+        # If no cover card is set, set it automatically
+        if not self.cover_card:
+            self.set_highest_rarity_cover()
         
     @property
     def card_count(self):
@@ -168,6 +200,15 @@ class DeckCard(models.Model):
         # Enforce Pokemon TCG rules
         if self.quantity > 4 and self.card.card_type != 'Energy':
             raise ValidationError('You can only have 4 of the same card in a deck')
+        
+    def save(self, *args, **kwargs):
+        is_new = not self.pk
+        super().save(*args, **kwargs)
+        
+        # If this is a new card and it's rarer than the current cover,
+        # update the deck's cover card
+        if is_new and not self.deck.cover_card:
+            self.deck.set_highest_rarity_cover()
 
 # core/models.py
 class DeckVote(models.Model):

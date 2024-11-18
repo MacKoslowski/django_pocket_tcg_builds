@@ -2,6 +2,7 @@
 {% load static %}
 {% load core_tags %}
 {% block content %}
+
 <div class="container py-4">
     <!-- Deck Header -->
     <div class="row mb-4">
@@ -12,7 +13,9 @@
                 {{ deck.created_at|date:"F j, Y" }}
             </p>
             <p>{{ deck.user_description }}</p>
-            
+            {% if deck.cover_card %}
+                {% render_card deck.cover_card show_add_button=False deck=deck %}
+            {% endif %}
             <!-- Color Tags -->
             <div class="mb-3">
                 <span class="badge bg-{{ deck.color_1 }}">{{ deck.get_color_1_display }}</span>
@@ -23,38 +26,7 @@
         </div>
         
         <div class="col-md-4">
-            <!-- Voting Section -->
-            <div class="card shadow-sm">
-                <div class="card-body text-center">
-                    <h3 id="vote-count">{{ vote_count }}</h3>
-                    <p class="text-muted">votes</p>
-                    
-                    {% if user.is_authenticated %}
-                        <div class="btn-group">
-                            <button class="btn btn-outline-primary {% if user_vote == 1 %}active{% endif %}"
-                                    hx-post="{% url 'core:vote_deck' deck.deck_id %}"
-                                    hx-vals='{"vote_type": "up"}'
-                                    hx-trigger="click"
-                                    hx-swap="none"
-                                    hx-on::after-request="updateVoteCount(event.detail.xhr.response)">
-                                <i class="fas fa-arrow-up"></i>
-                            </button>
-                            <button class="btn btn-outline-primary {% if user_vote == -1 %}active{% endif %}"
-                                    hx-post="{% url 'core:vote_deck' deck.deck_id %}"
-                                    hx-vals='{"vote_type": "down"}'
-                                    hx-trigger="click"
-                                    hx-swap="none"
-                                    hx-on::after-request="updateVoteCount(event.detail.xhr.response)">
-                                <i class="fas fa-arrow-down"></i>
-                            </button>
-                        </div>
-                    {% else %}
-                        <a href="{% url 'account_login' %}" class="btn btn-primary">
-                            Login to Vote
-                        </a>
-                    {% endif %}
-                </div>
-            </div>
+           {% include '_deck_vote.html' %}
         </div>
     </div>
 

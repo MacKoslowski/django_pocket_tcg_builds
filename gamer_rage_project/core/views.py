@@ -71,8 +71,24 @@ def update_secondary_color(request):
     return render(request, '_secondary_color_options.html', {
         'color_types': color_types
     })
+
 #@login_required
 def search_cards(request):
+    query = request.GET.get('search', '')
+    cards = Card.objects.filter(title__icontains=query)[:10]
+    html = render_to_string(
+        '_card_search_results.html', 
+        {'cards': cards},
+        request=request
+    )
+    return HttpResponse(html)
+
+#@login_required
+def vote(request):
+    if request.method == 'POST':
+        vote_type = request.POST.get('value')
+        deck_id = request.POST.get('deck_id')
+        user = request.auth.user
     query = request.GET.get('search', '')
     cards = Card.objects.filter(title__icontains=query)[:10]
     html = render_to_string(
@@ -149,7 +165,14 @@ def delete_deck(request, deck_id):
 def toggle_deck_vote(request, deck_id):
     if request.method == 'POST':
         deck = get_object_or_404(Deck, deck_id=deck_id)
-        vote_value = int(request.POST.get('value'))  # 1 or -1
+        vote_type = request.POST.get('vote_type');
+        vote_value = 0
+        if vote_type == 'up':
+            vote_value = 1
+        elif vote_value == 'down':
+            vote_value = -1
+        else:
+            return HttpResponse(status=400)
         
         vote, created = DeckVote.objects.get_or_create(
             deck=deck,
@@ -169,12 +192,19 @@ def toggle_deck_vote(request, deck_id):
         # Get updated counts
         vote_sum = deck.votes.aggregate(total=Sum('value'))['total'] or 0
         
-        return JsonResponse({
+        return render(request, '_deck_vote.html', {
+            'deck': deck,
             'vote_sum': vote_sum,
             'user_vote': vote_value if (created or vote.value == vote_value) else 0
         })
     
-    return JsonResponse({'error': 'Invalid request'}, status=400)
+    elif request.methd == 'GET':
+        return render(request, '_deck_vote.html', {
+            'deck': deck,
+            'vote_sum': vote_sum,
+            'user_vote': vote_value if (created or vote.value == vote_value) else 0
+        })
+
 
 @login_required
 def toggle_deck_reaction(request, deck_id):
