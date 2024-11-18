@@ -163,13 +163,13 @@ def delete_deck(request, deck_id):
 
 @login_required
 def toggle_deck_vote(request, deck_id):
+    deck = get_object_or_404(Deck, deck_id=deck_id)
     if request.method == 'POST':
-        deck = get_object_or_404(Deck, deck_id=deck_id)
-        vote_type = request.POST.get('vote_type');
+        vote_type = request.POST.get('vote_type')
         vote_value = 0
         if vote_type == 'up':
             vote_value = 1
-        elif vote_value == 'down':
+        elif vote_type == 'down':
             vote_value = -1
         else:
             return HttpResponse(status=400)
@@ -191,7 +191,6 @@ def toggle_deck_vote(request, deck_id):
         
         # Get updated counts
         vote_sum = deck.votes.aggregate(total=Sum('value'))['total'] or 0
-        
         return render(request, '_deck_vote.html', {
             'deck': deck,
             'vote_sum': vote_sum,
@@ -199,10 +198,14 @@ def toggle_deck_vote(request, deck_id):
         })
     
     elif request.methd == 'GET':
+        vote = DeckVote.objects.filter(deck=deck,
+            user=request.user).first()
+            
+        vote_sum = deck.votes.aggregate(total=Sum('value'))['total'] or 0
         return render(request, '_deck_vote.html', {
             'deck': deck,
             'vote_sum': vote_sum,
-            'user_vote': vote_value if (created or vote.value == vote_value) else 0
+            'user_vote': vote.value
         })
 
 
@@ -246,7 +249,7 @@ def deck_detail(request, deck_id):
     deck_cards = deck.deckcards.select_related('card').all()
     
     # Get vote information
-    vote_count = deck.votes.count()
+    vote_count = deck.votes.aggregate(total=Sum('value'))['total'] or 0
     user_vote = None
     if request.user.is_authenticated:
         user_vote = deck.votes.filter(user=request.user).first()
@@ -254,41 +257,8 @@ def deck_detail(request, deck_id):
     context = {
         'deck': deck,
         'deck_cards': deck_cards,
-        'vote_count': vote_count,
+        'vote_sum': vote_count,
         'user_vote': user_vote.value if user_vote else None,
     }
     
     return render(request, 'deck_detail.html', context)
-
-@login_required
-def vote_deck(request, deck_id):
-    if request.method == 'POST':
-        deck = get_object_or_404(Deck, deck_id=deck_id)
-        vote_type = request.POST.get('vote_type')
-        
-        if vote_type not in ['up', 'down']:
-            return JsonResponse({'error': 'Invalid vote type'}, status=400)
-            
-        vote_value = 1 if vote_type == 'up' else -1
-        
-        vote, created = DeckVote.objects.get_or_create(
-            deck=deck,
-            user=request.user,
-            defaults={'value': vote_value}
-        )
-        
-        if not created:
-            if vote.value == vote_value:
-                vote.delete()  # Remove vote if clicking same button
-            else:
-                vote.value = vote_value  # Change vote if clicking different button
-                vote.save()
-        
-        # Return updated vote count
-        new_count = deck.votes.aggregate(total=models.Sum('value'))['total'] or 0
-        return JsonResponse({
-            'vote_count': new_count,
-            'user_vote': vote_value if (created or vote.value == vote_value) else None
-        })
-    
-    return JsonResponse({'error': 'Invalid request'}, status=400)

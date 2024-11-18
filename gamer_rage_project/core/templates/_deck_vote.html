@@ -1,9 +1,8 @@
  <!-- Voting Section -->
  <div class="card shadow-sm" id="vote_section">
     <div class="card-body text-center">
-        <h3 id="vote-count">{{ vote_count }}</h3>
+        <h3 id="vote-count">{{ vote_sum }}</h3>
         <p class="text-muted">votes</p>
-        {{deck.deck_id}}
         {% if user.is_authenticated %}
             <div class="btn-group">
                 <button class="btn btn-outline-primary {% if user_vote == 1 %}active{% endif %}"
