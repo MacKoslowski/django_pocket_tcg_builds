@@ -231,9 +231,15 @@ class DeckReaction(models.Model):
         ('💪', 'Strong'),
         ('🎯', 'Target'),
         ('❤️', 'Heart'),
-        ('👍', 'Thumbs Up'),
-        ('👎', 'Thumbs Down'),
-        ('🏆', 'Trophy'),
+        ('💔', 'Broken Heart'),
+        ('🎲', 'Dice'),
+        ('✅', 'Check Mark'),
+        ('❌', 'Cross Mark'),
+        ('🗑️', 'Trash'),
+        ('👁️', 'Eye'),
+        ('💫', 'Dizzy'),
+        ('🛡️', 'Shield'),
+        ('⚠️', 'Warning'),
     ]
     react_id = models.AutoField(primary_key=True)
     deck = models.ForeignKey(Deck, related_name='reactions', on_delete=models.CASCADE)

@@ -1,4 +1,5 @@
  <!-- Voting Section -->
+ {% load core_tags %}
  <div class="card shadow-sm" id="vote_section">
     <div class="card-body text-center">
         <h3 id="vote-count">{{ vote_sum }}</h3>
@@ -22,6 +23,8 @@
                         👎
                 </button>
             </div>
+            {% include '_deck_reactions.html' %}
+
         {% else %}
             <a href="{% url 'account_login' %}" class="btn btn-primary">
                 Login to Vote

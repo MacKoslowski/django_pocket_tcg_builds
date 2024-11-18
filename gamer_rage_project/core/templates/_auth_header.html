@@ -4,39 +4,28 @@
 
 <div class="auth-header">
     {% if user.is_authenticated %}
-        <div class="d-flex align-items-center gap-3">
-            <!-- My Decks Link -->
-            <a href="{% url 'core:deck_list' %}" class="text-light text-decoration-none">
-                <i class="fas fa-folder me-1"></i>My Decks
-            </a>
-
-            <!-- Create Deck Link -->
-            <a href="{% url 'core:create_deck' %}" class="text-light text-decoration-none">
-                <i class="fas fa-plus me-1"></i>Create
-            </a>
-
-            <!-- Vertical Divider -->
-            <div class="vr bg-light opacity-25 d-none d-lg-block"></div>
-
-            <!-- Profile Section -->
-            <div class="d-flex align-items-center">
-                {% get_discord_data user as discord %}
-                {% if discord.avatar %}
-                    <img src="https://cdn.discordapp.com/avatars/{{ discord.uid }}/{{ discord.avatar }}.png"
-                         class="rounded-circle me-2"
-                         width="32"
-                         height="32"
-                         alt="{{ user.username }}">
-                {% else %}
-                    <div class="rounded-circle bg-secondary me-2 d-flex align-items-center justify-content-center"
-                         style="width: 32px; height: 32px;">
-                        <i class="fas fa-user text-light"></i>
-                    </div>
-                {% endif %}
-                <span class="text-light me-3">{{ user.username }}</span>
-                <a href="{% url 'account_logout' %}" class="btn btn-outline-light btn-sm">
-                    <i class="fas fa-sign-out-alt"></i>
-                </a>
+        {% get_discord_data user as discord %}
+        <div class="d-flex align-items-center">
+            {% if discord.avatar %}
+                <img src="https://cdn.discordapp.com/avatars/{{ discord.uid }}/{{ discord.avatar }}.png"
+                     class="rounded-circle me-2"
+                     width="32"
+                     height="32"
+                     alt="{{ user.username }}">
+            {% endif %}
+            <div class="dropdown">
+                <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    {{ user.username }}
+                    {% if discord.discriminator != '0' %}
+                        <span class="text-muted">#{{ discord.discriminator }}</span>
+                    {% endif %}
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="{% url 'core:create_deck' %}">Create Deck</a></li>
+                    <li><a class="dropdown-item" href="{% url 'core:deck_list' %}">My Decks</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{% url 'account_logout' %}">Logout</a></li>
+                </ul>
             </div>
         </div>
     {% else %}
@@ -45,33 +34,3 @@
         </a>
     {% endif %}
 </div>
-
-<style>
-.btn-discord {
-    background-color: #7289DA;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    transition: all 0.2s;
-}
-
-.btn-discord:hover {
-    background-color: #5c6fb1;
-    color: white;
-    transform: translateY(-1px);
-}
-
-.auth-header a:hover {
-    opacity: 0.8;
-}
-
-/* Optional: Add responsive adjustments */
-@media (max-width: 768px) {
-    .auth-header .d-flex {
-        gap: 1rem !important;
-    }
-    .vr {
-        display: none !important;
-    }
-}
-</style>

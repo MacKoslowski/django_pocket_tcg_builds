@@ -1,55 +1,13 @@
-<!-- templates/core/_deck_reactions.html -->
-<div class="deck-reactions mb-3">
-    <!-- Voting -->
-    <div class="voting-buttons mb-2">
-        <button class="btn btn-sm btn-outline-primary me-1 {% if user_vote == 1 %}active{% endif %}"
-                hx-post="{% url 'core:toggle_deck_vote' deck.deck_id %}"
-                hx-vals='{"value": 1}'
-                hx-target="closest .deck-reactions">
-            ⬆️ <span class="vote-count">{{ vote_sum|default:0 }}</span>
-        </button>
-        <button class="btn btn-sm btn-outline-danger {% if user_vote == -1 %}active{% endif %}"
-                hx-post="{% url 'core:toggle_deck_vote' deck.deck_id %}"
-                hx-vals='{"value": -1}'
-                hx-target="closest .deck-reactions">
-            ⬇️
-        </button>
-    </div>
-
-    <!-- Emoji Reactions -->
-    <div class="emoji-reactions">
-        {% for emoji, name in reaction_choices %}
-        <button class="btn btn-sm btn-light me-1 mb-1 {% if user_reactions|lookup:emoji %}active{% endif %}"
-                hx-post="{% url 'core:toggle_deck_reaction' deck.deck_id %}"
-                hx-vals='{"emoji": "{{ emoji }}"}'
-                hx-target="closest .deck-reactions">
-            {{ emoji }} 
-            <span class="reaction-count">{{ reaction_counts|lookup:emoji|default:0 }}</span>
-        </button>
-        {% endfor %}
-    </div>
+<!-- Emoji Reactions -->
+{% load core_tags %}
+<div class="emoji-reactions" id="reactBlock">
+    {% for emoji, name in reaction_choices %}
+    <button class="btn btn-sm btn-light me-1 mb-1 {% if user_reaction.emoji == emoji %}active{% endif %}"
+            hx-post="{% url 'core:toggle_deck_reaction' deck.deck_id %}"
+            hx-vals='{"emoji": "{{ emoji }}"}'
+            hx-target="#reactBlock">
+        {{ emoji }} 
+        <span class="reaction-count">{{ reaction_counts|lookup:emoji|default:0 }}</span>
+    </button>
+    {% endfor %}
 </div>
-
-<style>
-.emoji-reactions button {
-    transition: transform 0.1s;
-}
-
-.emoji-reactions button:hover {
-    transform: scale(1.1);
-}
-
-.emoji-reactions button.active {
-    background-color: #e3f2fd;
-    border-color: #90caf9;
-}
-
-.voting-buttons button {
-    min-width: 60px;
-}
-
-.reaction-count {
-    font-size: 0.8em;
-    color: #666;
-}
-</style>

@@ -226,22 +226,41 @@ def toggle_deck_reaction(request, deck_id):
         )
         
         if not created:
-            # Remove reaction if already exists
-            reaction.delete()
+            if reaction.emoji == emoji:
+                # Remove vote if clicking same button
+                reaction.delete()
+            else:
+                # Change vote if clicking different button
+                reaction.emoji = emoji
+                reaction.save()
         
         # Get updated counts
         reactions = DeckReaction.objects.filter(deck=deck).values('emoji').annotate(
-            count=Count('id')
+            count=Count('deck_id')
         )
-        
-        return JsonResponse({
+        reaction_counts = {r['emoji']: r['count'] for r in reactions}
+        return render(request, '_deck_reactions.html', {
             'reactions': list(reactions),
-            'user_reacted': created
+            'user_reaction': reaction,
+            'reaction_counts': reaction_counts,
+            'reaction_choices': DeckReaction.EMOJI_CHOICES,
+            'deck': deck
         })
     
-    return JsonResponse({'error': 'Invalid request'}, status=400)
-
-# core/views.py
+    # elif request.method == 'GET':
+    #     user_reaction = DeckReaction.objects.filter(deck=deck,
+    #         user=request.user).first()
+            
+    #     reactions = DeckReaction.objects.filter(deck=deck).values('emoji').annotate(
+    #         count=Count('deck_id')
+    #     )
+    #     reaction_counts = {r['emoji']: r['count'] for r in reactions}
+    #     return render(request, '_deck_reactions.html', {
+    #         'reactions': list(reactions),
+    #         'user_reacted': created,
+    #         'reaction_counts': reaction_counts
+    #     })
+    
 def deck_detail(request, deck_id):
     deck = get_object_or_404(Deck, deck_id=deck_id)
     
@@ -253,12 +272,21 @@ def deck_detail(request, deck_id):
     user_vote = None
     if request.user.is_authenticated:
         user_vote = deck.votes.filter(user=request.user).first()
+     # Get reaction info
+    reactions = deck.reactions.values('emoji').annotate(count=Count('deck_id'))
+    reaction_counts = {r['emoji']: r['count'] for r in reactions}
+    user_reaction = DeckReaction.objects.filter(deck=deck,
+             user=request.user).first()
+    
     print(deck_cards)
     context = {
         'deck': deck,
         'deck_cards': deck_cards,
         'vote_sum': vote_count,
         'user_vote': user_vote.value if user_vote else None,
+        'reaction_counts': reaction_counts,
+        'user_reactions': user_reaction,
+        'reaction_choices': DeckReaction.EMOJI_CHOICES,
     }
     
     return render(request, 'deck_detail.html', context)

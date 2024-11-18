@@ -42,3 +42,7 @@ def get_discord_data(user):
     except:
         pass
     return None
+
+@register.filter
+def lookup(dictionary, key):
+    return dictionary.get(key)
