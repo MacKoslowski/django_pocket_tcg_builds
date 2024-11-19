@@ -30,7 +30,7 @@ SECRET_KEY = os.environ.get('django_key')
 
 ALLOWED_HOSTS = ['*']
 
-
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # Application definition
 
 INSTALLED_APPS = [
