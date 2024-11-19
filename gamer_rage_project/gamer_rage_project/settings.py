@@ -24,12 +24,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-#&fqaxshg*+17^-lee1@&@ja-si#eyavi&6x#3+k9glkk3*322'
+SECRET_KEY = os.environ.get('django_key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['pocketbuilds.pythonanywhere.com']
 
 
 # Application definition
@@ -138,12 +137,34 @@ HANDLER403 = 'core.views.custom_permission_denied'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+DB_PASS = os.environ.get('DB_PASS')
+DB_HOST = os.environ.get('DB_HOST')
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+     'default': {
+
+        'ENGINE': 'django.db.backends.mysql',
+
+        'NAME': 'pbuilds',
+
+        'USER': 'django_user',
+
+        'PASSWORD': DB_PASS,
+
+        'HOST': DB_HOST,
+
+        'PORT': 5432,
+
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 
 
 # Password validation
