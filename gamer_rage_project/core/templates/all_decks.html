@@ -1,0 +1,73 @@
+<!-- templates/core/all_decks.html (main template) -->
+{% extends 'base.html' %}
+{% load core_tags %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Search and Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form hx-get="{% url 'core:all_decks_results' %}" 
+                  hx-target="#deck-list" 
+                  hx-push-url="true"
+                  hx-trigger="change delay:500ms, submit"
+                  class="row g-3">
+                 <!-- Deck Search -->
+                 <div class="col-md-4">
+                    <label class="form-label">Search Decks</label>
+                    <input type="text" 
+                           class="form-control" 
+                           name="search" 
+                           value="{{ search_query }}"
+                           placeholder="Search deck titles & descriptions...">
+                </div>
+
+                <!-- Card Search -->
+                <div class="col-md-4">
+                    <label class="form-label">Search by Card</label>
+                    <input type="text" 
+                           class="form-control" 
+                           name="card" 
+                           value="{{ card_search }}"
+                           placeholder="Search for decks containing card...">
+                </div>
+
+                <!-- Type Filter -->
+                <div class="col-md-2">
+                    <label class="form-label">Deck Type</label>
+                    <select class="form-select" name="type">
+                        <option value="">All Types</option>
+                        {% for value, label in color_types %}
+                            <option value="{{ value }}" 
+                                    {% if deck_type == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Sort -->
+                <div class="col-md-2">
+                    <label class="form-label">Sort By</label>
+                    <select class="form-select" name="sort">
+                        <option value="recent" {% if sort_by == 'recent' %}selected{% endif %}>
+                            Most Recent
+                        </option>
+                        <option value="votes" {% if sort_by == 'votes' %}selected{% endif %}>
+                            Most Votes
+                        </option>
+                        <option value="popular" {% if sort_by == 'popular' %}selected{% endif %}>
+                            Most Popular
+                        </option>
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results Container -->
+    <div id="deck-list">
+        {% include '_all_deck_results.html' %}  <!-- Include partial -->
+    </div>
+</div>
+{% endblock %}

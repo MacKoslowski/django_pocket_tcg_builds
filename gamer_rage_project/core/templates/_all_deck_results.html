@@ -1,0 +1,24 @@
+<!-- templates/core/partials/_deck_results.html (partial for HTMX updates) -->
+{% load core_tags %}
+
+{% if decks %}
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for deck in decks %}
+            <div class="col">
+                {% render_deck deck %}
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if decks.has_other_pages %}
+        <nav aria-label="Page navigation" class="mt-4">
+            <!-- ... pagination content ... -->
+        </nav>
+    {% endif %}
+{% else %}
+    <div class="text-center py-5">
+        <h3>No decks found</h3>
+        <p class="text-muted">Try adjusting your search filters</p>
+    </div>
+{% endif %}

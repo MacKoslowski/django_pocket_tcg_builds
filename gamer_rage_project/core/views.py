@@ -5,12 +5,69 @@ from .models import Card, Deck, DeckCard, ColorTypes, DeckReaction, DeckVote, Re
 from django.template.loader import render_to_string
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, Q
 from openai import OpenAI
 from django.contrib import messages
 from .permissions import deck_owner_required
-import os
 from django.conf import settings
+from django.core.paginator import Paginator
+
+def all_decks(request):
+    # Regular request shows full page
+    context = get_decks_context(request)  # Helper function for shared logic
+    return render(request, 'all_decks.html', context)
+
+def all_decks_results(request):
+    # HTMX request only returns results partial
+    context = get_decks_context(request)
+    return render(request, '_all_deck_results.html', context)
+
+def get_decks_context(request):
+    # Shared logic for both views
+    decks = Deck.objects.filter(public=True).select_related('creator')
+    
+    search_query = request.GET.get('search', '')
+    card_search = request.GET.get('card', '')
+    deck_type = request.GET.get('type', '')
+    sort_by = request.GET.get('sort', '-created_at')
+
+    if search_query:
+        decks = decks.filter(
+            Q(user_title__icontains=search_query) |
+            Q(user_description__icontains=search_query)
+        )
+
+    if card_search:
+        decks = decks.filter(cards__title__icontains=card_search).distinct()
+
+    if deck_type:
+        decks = decks.filter(Q(color_1=deck_type) | Q(color_2=deck_type))
+
+    # Sorting
+    if sort_by == 'votes':
+        decks = decks.annotate(vote_count=Sum('votes__value')).order_by('-vote_count')
+    elif sort_by == 'recent':
+        decks = decks.order_by('-created_at')
+    elif sort_by == 'popular':
+        decks = decks.annotate(
+            total_reactions=Count('reactions'),
+            vote_count=Sum('votes__value')
+        ).order_by('-total_reactions', '-vote_count')
+
+    # Pagination
+    paginator = Paginator(decks, 12)  # 12 decks per page
+    page = request.GET.get('page')
+    decks = paginator.get_page(page)
+
+    return {
+        'decks': decks,
+        'search_query': search_query,
+        'card_search': card_search,
+        'deck_type': deck_type,
+        'sort_by': sort_by,
+        'color_types': ColorTypes.choices,
+    }
+
 def home(request):
     # Example data for demonstration
     #trending_decks = Deck.objects.annotate(
