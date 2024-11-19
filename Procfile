@@ -1,0 +1,1 @@
+web: gunicorn gamer_rage_project.wsgi
