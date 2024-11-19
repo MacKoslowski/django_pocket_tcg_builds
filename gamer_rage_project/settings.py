@@ -83,7 +83,7 @@ OPENAI_API_KEY=os.getenv('OPENAI_API_KEY')
 CLIENT_ID = os.environ.get("client_id")
 DISCORD_SECRET = os.environ.get('client_secret')
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG") == "True"
+DEBUG = os.environ.get("debug") == "True"
 
 # Discord Specific Settings
 DISCORD_KEY = os.environ.get('public_key')
