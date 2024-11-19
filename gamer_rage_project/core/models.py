@@ -126,7 +126,7 @@ class Deck(models.Model):
     user_title = models.CharField(max_length=30)
     user_description = models.CharField(max_length=200)
     color_1 = models.CharField(max_length=30,  choices=ColorTypes.choices)
-    color_2 = models.CharField(max_length=30,  choices=ColorTypes.choices) 
+    color_2 = models.CharField(max_length=30,  choices=ColorTypes.choices, null=True) 
     created_at = models.DateTimeField(auto_now_add=True)  # Set once when created
     public = models.BooleanField(default=False)
     modified_at = models.DateTimeField(auto_now=True)     # Updates on every save
