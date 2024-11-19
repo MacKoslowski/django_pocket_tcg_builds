@@ -131,7 +131,7 @@ TEMPLATES = [
         },
     },
 ]
-
+HANDLER403 = 'core.views.custom_permission_denied'
 #WSGI_APPLICATION = 'gamer_rage_project.wsgi.application'
 
 

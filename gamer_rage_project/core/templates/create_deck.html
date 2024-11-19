@@ -8,9 +8,8 @@
           <h5 class="card-title">Create New Deck</h5>
           <form
             id="deck-form"
-            hx-post="{% url 'core:create_deck' %}"
-            hx-trigger="submit"
-            hx-redirect="true"
+            method="post"
+            action="{% url 'core:create_deck' %}"
             class="p-3"
           >
             {% csrf_token %}

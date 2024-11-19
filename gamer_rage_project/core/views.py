@@ -8,8 +8,9 @@ from django.http import JsonResponse
 from django.db.models import Count, Sum
 from openai import OpenAI
 from django.contrib import messages
+from .permissions import deck_owner_required
 import os
-OpenAI.api_key = os.getenv('OPENAI_API_KEY')
+from django.conf import settings
 def home(request):
     # Example data for demonstration
     #trending_decks = Deck.objects.annotate(
@@ -39,6 +40,7 @@ def deck_list(request):
     })
 
 @login_required
+@deck_owner_required
 def toggle_deck_public(request, deck_id):
     if request.method == 'POST':
         deck = get_object_or_404(Deck, deck_id=deck_id, creator=request.user)
@@ -54,22 +56,23 @@ def create_deck(request):
        title = request.POST.get('title')
        description = request.POST.get('description')
 
-       # Check content with OpenAI moderation
-       try:
-           client = OpenAI()
-           moderation = client.moderations.create(
-               model="omni-moderation-latest",
-               input=f"title:{title}, description:{description}"
-           )
-           print(moderation.results[0])
-           if moderation.results[0].flagged:
-               return JsonResponse({
-                   'error': 'Content contains inappropriate language'
-               }, status=400)
+        # Check content with OpenAI moderation
+        #    try:
+        #        input = f"title:{title}, description:{description}"
+        #        print(input)
+        #        client = OpenAI(api_key = settings.OPENAI_API_KEY)
+        #        moderation = client.moderations.create(
+        #            input=input
+        #        )
+        #        print(moderation.results[0])
+        #        if moderation.results[0].flagged:
+        #            return JsonResponse({
+        #                'error': 'Content contains inappropriate language'
+        #            }, status=400)
 
-       except Exception as e:
-           # Log the error but allow creation to continue
-           print(f"Moderation API error: {str(e)}")
+        #    except Exception as e:
+        #        # Log the error but allow creation to continue
+        #        print(f"Moderation API error: {str(e)}")
 
        deck = Deck.objects.create(
            user_title=title,
@@ -85,6 +88,7 @@ def create_deck(request):
    })
 
 @login_required
+@deck_owner_required
 def build_deck(request, deck_id):
     deck = get_object_or_404(Deck, deck_id=deck_id, creator=request.user)
     search_cards = Card.objects.all()[:10]
@@ -128,6 +132,7 @@ def search_cards(request):
 
 
 @login_required
+@deck_owner_required
 def add_card_to_deck(request, deck_id):
     if request.method == 'POST':
         deck = Deck.objects.get(deck_id=deck_id)
@@ -146,6 +151,7 @@ def add_card_to_deck(request, deck_id):
         return render(request, '_deck_card_list.html', {'deck': deck})
 
 @login_required
+@deck_owner_required
 def remove_card_from_deck(request, deck_id, card_id):
     if request.method == 'POST':
         DeckCard.objects.filter(deck_id=deck_id, card_id=card_id).delete()
@@ -154,6 +160,7 @@ def remove_card_from_deck(request, deck_id, card_id):
     
 
 @login_required
+@deck_owner_required
 def toggle_deck_visibility(request, deck_id):
     if request.method == 'POST':
         deck = get_object_or_404(Deck, deck_id=deck_id, creator=request.user)
@@ -163,6 +170,7 @@ def toggle_deck_visibility(request, deck_id):
     return HttpResponse(status=405)
 
 @login_required
+@deck_owner_required
 def delete_deck(request, deck_id):
     if request.method == 'DELETE':
         deck = get_object_or_404(Deck, deck_id=deck_id, creator=request.user)
@@ -336,3 +344,6 @@ def report_deck(request, deck_id):
         return HttpResponse(status=200)
         
     return HttpResponse(status=405)
+
+def custom_permission_denied(request, exception):
+    return render(request, '403.html', status=403)
