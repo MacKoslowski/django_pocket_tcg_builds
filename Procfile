@@ -1,1 +1,1 @@
-web: gunicorn gamer_rage_project.wsgi
+web: python manage.py collectstatic --no-input && gunicorn gamer_rage_project.wsgi
