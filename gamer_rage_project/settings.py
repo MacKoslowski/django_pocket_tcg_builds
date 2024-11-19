@@ -61,7 +61,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.discord',
     #mine 
     'core',
-    'fontawesomefree'
+    'fontawesomefree',
+    'whitenoise.runserver_nostatic'
 ]
 SITE_ID = 1
 # Auth Settings
