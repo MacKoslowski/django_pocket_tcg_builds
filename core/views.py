@@ -352,13 +352,15 @@ def deck_detail(request, deck_id):
     # Get vote information
     vote_count = deck.votes.aggregate(total=Sum('value'))['total'] or 0
     user_vote = None
+    user_reaction = None
     if request.user.is_authenticated:
         user_vote = deck.votes.filter(user=request.user).first()
+        user_reaction = DeckReaction.objects.filter(deck=deck,
+             user=request.user).first()
      # Get reaction info
     reactions = deck.reactions.values('emoji').annotate(count=Count('deck_id'))
     reaction_counts = {r['emoji']: r['count'] for r in reactions}
-    user_reaction = DeckReaction.objects.filter(deck=deck,
-             user=request.user).first()
+    
     
     context = {
         'deck': deck,
