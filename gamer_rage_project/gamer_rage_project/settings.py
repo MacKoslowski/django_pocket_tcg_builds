@@ -139,25 +139,26 @@ HANDLER403 = 'core.views.custom_permission_denied'
 
 DB_PASS = os.environ.get('DB_PASS')
 DB_HOST = os.environ.get('DB_HOST')
-
+DB_NAME = os.environ.get('DB_NAME')
+DB_USER = os.environ.get('DB_USER')
+DB_PORT = os.environ.get('DB_PORT')
 DATABASES = {
      'default': {
 
         'ENGINE': 'django.db.backends.mysql',
 
-        'NAME': 'pbuilds',
+        'NAME': DB_NAME,
 
-        'USER': 'django_user',
+        'USER': DB_USER,
 
         'PASSWORD': DB_PASS,
 
         'HOST': DB_HOST,
 
-        'PORT': 5432,
+        'PORT': DB_PORT,
 
     }
 }
-
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',
