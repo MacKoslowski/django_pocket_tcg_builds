@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.forms import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 class ColorTypes(models.TextChoices):
@@ -169,6 +170,10 @@ class Deck(models.Model):
 
     def save(self, *args, **kwargs):
         # First save to ensure we have an ID
+        if not self.pk:  # New deck
+            deck_count = Deck.objects.filter(creator=self.creator).count()
+            if deck_count >= 20:
+                raise ValidationError("Maximum deck limit (20) reached")
         super().save(*args, **kwargs)
         
         # If no cover card is set, set it automatically

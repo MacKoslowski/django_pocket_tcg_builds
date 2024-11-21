@@ -171,7 +171,7 @@ DATABASES = {
         'HOST': DB_HOST,
 
         'PORT': DB_PORT,
-
+        'CONN_MAX_AGE': 60,  # Keep connections alive for 60 seconds
     }
 }
 # DATABASES = {

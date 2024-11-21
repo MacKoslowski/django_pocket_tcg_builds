@@ -11,6 +11,8 @@ from django.contrib import messages
 from .permissions import deck_owner_required
 from django.conf import settings
 from django.core.paginator import Paginator
+import json
+from .rate_limit import rate_limit
 
 def all_decks(request):
     # Regular request shows full page
@@ -108,6 +110,7 @@ def toggle_deck_public(request, deck_id):
 
 
 @login_required
+@rate_limit('create_deck', limit=5, period=3600)  # 5 decks per hour
 def create_deck(request):
    if request.method == 'POST':
        title = request.POST.get('title')
@@ -147,11 +150,20 @@ def create_deck(request):
 @login_required
 @deck_owner_required
 def build_deck(request, deck_id):
-    deck = get_object_or_404(Deck, deck_id=deck_id, creator=request.user)
-    search_cards = Card.objects.all()[:10]
+    deck = get_object_or_404(Deck, deck_id=deck_id)
+    
+    cards_data = [{
+        'card_id': card.card_id,
+        'title': card.title,
+        'type': card.type,
+        'color': card.color,
+        'hp': card.hp,
+        'image_url': card.image_url
+    } for card in Card.objects.all()]
+    
     return render(request, 'edit_deck.html', {
         'deck': deck,
-        'cards': search_cards
+        'cards_json': json.dumps(cards_data)
     })
 
 def update_secondary_color(request):
@@ -236,6 +248,7 @@ def delete_deck(request, deck_id):
     return HttpResponse(status=405)
 
 @login_required
+@rate_limit('vote', limit=30, period=60)  # 30 votes per minute
 def toggle_deck_vote(request, deck_id):
     deck = get_object_or_404(Deck, deck_id=deck_id)
     if request.method == 'POST':
@@ -294,6 +307,7 @@ def toggle_deck_vote(request, deck_id):
         })
 
 @login_required
+@rate_limit('vote', limit=30, period=60)  # 30 votes per minute
 def toggle_deck_reaction(request, deck_id):
     if request.method == 'POST':
         deck = get_object_or_404(Deck, deck_id=deck_id)

@@ -55,22 +55,93 @@
                 <div class="card-body">
                     <h5 class="card-title">Search Cards</h5>
                     <input type="text" 
-                           name="search"
-                           class="form-control" 
-                           placeholder="Search cards..."
-                           hx-get="{% url 'core:search_cards'  %}"
-                           hx-trigger="keyup changed delay:500ms"
-                           hx-target="#search-results"
-                           hx-include="[name='deck_id'],[name='search']">
-                    <input type="hidden" name="deck_id" value="{{ deck.deck_id }}">
-                    <div id="search-results" class="mt-3">
-                        {% include '_card_search_results.html' %}
+                           id="card-search"
+                           class="form-control mb-3" 
+                           placeholder="Search cards...">
+
+                    <div id="card-results" class="row row-cols-3 g-2">
+                        <!-- Cards will be rendered here -->
                     </div>
                 </div>
             </div>
         </div>
-
        
     </div>
 </div>
+<script>
+    $(document).ready(function() {
+        const cards = {{ cards_json|safe }};
+        
+        // Initial render
+        renderCards(cards);
+        
+        // Search handler
+        $('#card-search').on('input', function() {
+            const query = $(this).val().toLowerCase();
+            
+            const filteredCards = !query ? cards : cards.filter(card => 
+                card.title.toLowerCase().includes(query) ||
+                card.type.toLowerCase().includes(query) ||
+                card.color.toLowerCase().includes(query)
+            );
+            console.log(filteredCards.length)
+            console.log(filteredCards)
+
+            renderCards(filteredCards);
+        });
+        
+        function renderCards(cardsToShow) {
+            const $results = $('#card-results');
+            $results.empty();
+            
+            cardsToShow.forEach(card => {
+                $results.append(`
+                    <div class="col">
+                        <div class="card h-100">
+                            <img src="${card.image_url}" 
+                                 alt="${card.title}"
+                                 class="card-img-top"
+                                 loading="lazy">
+                            <div class="card-body p-1">
+                                <div class="d-flex justify-content-between">
+                                    <input type="number"
+                                           class="form-control form-control-sm quantity-input"
+                                           style="width: 45px"
+                                           value="1"
+                                           min="1"
+                                           max="4">
+                                    <button class="btn btn-sm btn-primary add-card"
+                                            data-card-id="${card.card_id}">
+                                        Add
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `);
+            });
+        }
+        
+        // Add card handler using event delegation
+        $('#card-results').on('click', '.add-card', function(e) {
+            e.preventDefault();
+            const $btn = $(this);
+            const cardId = $btn.data('card-id');
+            const quantity = $btn.closest('.card-body').find('.quantity-input').val();
+            
+            $.ajax({
+                url: "{% url 'core:add_card_to_deck' deck.deck_id %}",
+                method: 'POST',
+                data: {
+                    'card_id': cardId,
+                    'quantity': quantity,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    $('#deck-cards').html(response);
+                }
+            });
+        });
+    });
+    </script>
 {% endblock %}
