@@ -15,6 +15,7 @@ from dotenv import load_dotenv
 import os
 load_dotenv()
 
+ADMINS = (('Foo', os.environ.get('ERROR_EMAIL')), )
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -22,7 +23,13 @@ LOGGING = {
         "console": {
             "class": "logging.StreamHandler",
         },
+        "mail_admins": {
+        "level": "ERROR",
+        "class": "django.utils.log.AdminEmailHandler",
+        "include_html": False,
     },
+    },
+
     "root": {
         "handlers": ["console"],
         "level": "WARNING",
