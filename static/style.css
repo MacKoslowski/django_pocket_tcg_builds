@@ -8,9 +8,9 @@
   padding: 2rem;
 }
 .navbar-logo {
-  width: 20em;
-  height: 15em;
-  clip-path: inset(25% 0 25% 0); /* Crops 25% from top and bottom */
+  width: 10em;
+  height: 3em;
+  /* clip-path: inset(25% 15% 25% 15%); Crops 25% from top and bottom */
   /* or circle: */
   /* clip-path: circle(40% at center); */
 }
