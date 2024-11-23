@@ -93,6 +93,24 @@ DISCORD_SECRET = os.environ.get('client_secret')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("debug") == "True"
 
+if not DEBUG:
+    # Add CSRF trusted origins for your production domain
+    CSRF_TRUSTED_ORIGINS = [
+        'https://pocket-builds.com',
+        'https://djangopockettcgbuilds-production.up.railway.app',
+        'https://djangopockettcgbuilds-development.up.railway.app/'
+        'http://localhost:8000',
+        'http://127.0.0.1:8000'
+    ]
+
+    # If you're using HTTPS in production (you should)
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True  # Redirect HTTP to HTTPS
+
+    # Session settings
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
 # Discord Specific Settings
 DISCORD_KEY = os.environ.get('public_key')
 SOCIALACCOUNT_PROVIDERS = {
@@ -106,6 +124,8 @@ SOCIALACCOUNT_PROVIDERS = {
         'AUTH_PARAMS': {'prompt': 'consent'},
     }
 }
+
+
 
 # Auth Settings
 ACCOUNT_EMAIL_REQUIRED = False
@@ -178,7 +198,7 @@ DATABASES = {
         'HOST': DB_HOST,
 
         'PORT': DB_PORT,
-        'CONN_MAX_AGE': 60,  # Keep connections alive for 60 seconds
+        #'CONN_MAX_AGE': 60,  # Keep connections alive for 60 seconds
     }
 }
 # DATABASES = {
