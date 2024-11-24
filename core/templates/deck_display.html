@@ -1,22 +1,6 @@
 {% load static %}
 {% load core_tags %}
 {% block extra_head %}
-<!-- OpenGraph Meta Tags -->
-<meta property="og:title" content="{{ deck.user_title }} - Pocket Builds">
-<meta property="og:description" content="{{ deck.user_description|truncatechars:200 }}">
-{% if deck.cover_card %}
-<meta property="og:image" content="{{ deck.cover_card.image_url }}">
-{% endif %}
-<meta property="og:url" content="{{ request.build_absolute_uri }}">
-<meta property="og:type" content="website">
-
-<!-- Twitter Card -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="{{ deck.user_title }} - Pocket Builds">
-<meta name="twitter:description" content="{{ deck.user_description|truncatechars:200 }}">
-{% if deck.cover_card %}
-<meta name="twitter:image" content="{{ deck.cover_card.image_url }}">
-{% endif %}
 {% endblock %}
 <!-- templates/core/components/deck_display.html -->
 <div class="card h-100 deck-card" id="deck-{{ deck.deck_id }}">
@@ -102,9 +86,9 @@
     transition: transform 0.2s;
  }
  
- .deck-card:hover {
+ /*.deck-card:hover {
     transform: translateY(-5px);
- }
+ }*/
  
  .card-title {
     font-size: 1.1rem;

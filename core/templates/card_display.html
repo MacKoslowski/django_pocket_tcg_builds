@@ -6,8 +6,7 @@
          alt="{{ card.title }}"
          loading="lazy"
          style="cursor: pointer;"
-         data-bs-toggle="modal" 
-         data-bs-target="#cardModal-{{ card.card_id }}">
+        >
     {% endif %}
     
     {% if show_add_button and deck %}
@@ -32,68 +31,7 @@
     </div>
     {% endif %}
  </form>
- 
- <!-- Modal -->
- <div class="modal fade" id="cardModal-{{ card.card_id }}" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">{{ card.title }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <img src="{{ card.image_url }}" 
-                             class="img-fluid" 
-                             alt="{{ card.title }}">
-                    </div>
-                    <div class="col-md-6">
-                        <table class="table table-small">
-                            <thead class="thead">
-                                <tr>
-                                    <th>
-                                        Type
-                                    </th>
-                                    <th>
-                                        Hp
-                                    </th>
-                                    <th>
-                                        Color
-                                    </th>
-                                    <th>
-                                        Rarity
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <td>
-                                    {{ card.get_type_display }}
-                                </td>
-                                <td>
-                                    {{ card.hp }}
-                                </td>
-                                <td>
-                                    <span class="badge bg-{{ card.color }}">
-                                        {{ card.get_color_display }}
-                                    </span>
-                                </td>
-                                <td>
-                                    {% if card.rarity %}
-                            
-                                    {{ card.rarity }}
-                                    {% endif %}
-                                </td>
-                                
-                            </tbody>
-                        </table>
-                           
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
- </div>
+
  
  <style>
  .pmon-card img {
@@ -106,9 +44,9 @@
     transition: transform 0.2s;
  }
  
- .pmon-card:hover {
+ /*.pmon-card:hover {
     transform: translateY(-5px);
- }
+ }*/
  
  dl {
     margin-bottom: 0;

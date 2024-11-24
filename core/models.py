@@ -182,9 +182,11 @@ class Deck(models.Model):
         
     @property
     def card_count(self):
-        return self.deckcards.aggregate(
-            total=models.Sum('quantity')
-        )['total'] or 0
+        total = 0
+        for card in self.deckcards.all():
+            total += card.quantity
+        print(total)
+        return total
 
 class DeckCard(models.Model):
     relation_id = models.AutoField(primary_key=True)
