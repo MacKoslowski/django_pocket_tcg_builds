@@ -167,35 +167,36 @@ def delete_account(request):
 @rate_limit('create_deck', limit=5, period=3600)  # 5 decks per hour
 def create_deck(request):
    if request.method == 'POST':
-       title = request.POST.get('title')
-       description = request.POST.get('description')
+        title = request.POST.get('title')
+        description = request.POST.get('description')
 
         # Check content with OpenAI moderation
-        #    try:
-        #        input = f"title:{title}, description:{description}"
-        #        print(input)
-        #        client = OpenAI(api_key = settings.OPENAI_API_KEY)
-        #        moderation = client.moderations.create(
-        #            input=input
-        #        )
-        #        print(moderation.results[0])
-        #        if moderation.results[0].flagged:
-        #            return JsonResponse({
-        #                'error': 'Content contains inappropriate language'
-        #            }, status=400)
+        try:
+            input = f"title:{title}, description:{description}"
+            print(input)
+            client = OpenAI(api_key = settings.OPENAI_API_KEY)
+            response = client.moderations.create(
+                model="omni-moderation-latest",
+                input=input,
+            )
+            print(response.results[0])
+            if response.results[0].flagged:
+                messages.warning(request, 'Harmful content detected. Deck discarded.')
+                return redirect('core:home')
 
-        #    except Exception as e:
-        #        # Log the error but allow creation to continue
-        #        print(f"Moderation API error: {str(e)}")
-
-       deck = Deck.objects.create(
+        except Exception as e:
+            # Log the error but allow creation to continue
+            messages.warning(request, 'Error in deck moderation. Please email fullstackmac1337@gmail.com')
+            return redirect('core:home')
+        
+        deck = Deck.objects.create(
            user_title=title,
            user_description=description,
            color_1=request.POST.get('primary_color'),
            color_2=request.POST.get('secondary_color') or None,
            creator=request.user
-       )
-       return redirect('core:build_deck', deck_id=deck.deck_id)
+        )
+        return redirect('core:build_deck', deck_id=deck.deck_id)
   
    return render(request, 'create_deck.html', {
        'color_types': ColorTypes.choices
