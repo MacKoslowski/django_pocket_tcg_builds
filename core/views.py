@@ -15,6 +15,11 @@ import json
 from django.contrib.auth import logout
 from .rate_limit import rate_limit
 from datetime import date
+import os
+def ads_txt_view(request):
+    with open(os.path.join(settings.STATIC_ROOT, 'ads.txt')) as file:
+        file_content = file.readlines()
+    return HttpResponse(file_content, content_type="text/plain")
 
 @login_required
 def account_settings(request):
