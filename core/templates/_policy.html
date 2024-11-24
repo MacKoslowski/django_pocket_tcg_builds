@@ -1,0 +1,37 @@
+<div class="container py-5">
+    <h1>Privacy Policy</h1>
+    <p>Last updated: {{ today }}</p>
+
+    <h2>Information We Collect</h2>
+    <ul>
+        <li>Discord account information (username, email if provided)</li>
+        <li>User-created content (decks, votes)</li>
+        <li>Usage data and cookies</li>
+    </ul>
+
+    <h2>How We Use Your Information</h2>
+    <ul>
+        <li>To provide and maintain the service</li>
+        <li>To identify you and your content</li>
+        <li>To prevent abuse and enforce our terms</li>
+    </ul>
+
+    <h2>Data Retention</h2>
+    <ul>
+        <li>Account data is retained until you delete your account</li>
+        <li>Deck data is retained until you delete the deck or your account</li>
+        <li>You can request account deletion at any time</li>
+    </ul>
+
+    <h2>Third Party Services</h2>
+    <ul>
+        <li>Discord (authentication)</li>
+        <li>Amazon S3 (image storage)</li>
+        {% if using_analytics %}
+        <li>Google Analytics (usage tracking)</li>
+        {% endif %}
+    </ul>
+
+    <h2>Contact</h2>
+    <p>For privacy concerns, contact: fullstackmac1337@gmail.com</p>
+</div>

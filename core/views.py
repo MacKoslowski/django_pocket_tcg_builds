@@ -12,7 +12,20 @@ from .permissions import deck_owner_required
 from django.conf import settings
 from django.core.paginator import Paginator
 import json
+from django.contrib.auth import logout
 from .rate_limit import rate_limit
+from datetime import date
+
+def terms(request):
+    return render(request, 'term_of_service.html', {
+        'today': date.today()
+    })
+
+def privacy(request):
+    return render(request, 'privacy_policy.html', {
+        'today': date.today(),
+        'using_analytics': False  # Change if using analytics
+    })
 
 def all_decks(request):
     # Regular request shows full page
@@ -108,6 +121,21 @@ def toggle_deck_public(request, deck_id):
         return HttpResponse(status=200)
     return HttpResponse(status=405)
 
+
+@login_required
+def delete_account(request):
+    if request.method == 'POST':
+        user = request.user
+        # Delete user's content
+        user.decks.all().delete()
+        user.submitted_reports.all().delete()
+        user.votes.all().delete()
+        # Delete the user
+        user.delete()
+        logout(request)
+        messages.success(request, 'Your account has been deleted.')
+        return redirect('home')
+    return render(request, 'account/delete_confirmation.html')
 
 @login_required
 @rate_limit('create_deck', limit=5, period=3600)  # 5 decks per hour

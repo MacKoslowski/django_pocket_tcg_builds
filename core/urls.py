@@ -28,4 +28,7 @@ urlpatterns = [
      path('deck/<int:deck_id>/report/', views.report_deck, name='report_deck'),
      path('decks/all/', views.all_decks, name='all_decks'),
      path('decks/all/results/', views.all_decks_results, name='all_decks_results'),
+     path('terms/', views.terms, name='terms'),
+     path('privacy/', views.privacy, name='privacy'),
+
 ]

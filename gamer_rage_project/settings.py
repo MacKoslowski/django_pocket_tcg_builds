@@ -94,6 +94,7 @@ DISCORD_SECRET = os.environ.get('client_secret')
 DEBUG = os.environ.get("debug") == "True"
 
 if not DEBUG:
+    print('in debug')
     # Add CSRF trusted origins for your production domain
     CSRF_TRUSTED_ORIGINS = [
         'https://pocket-builds.com',
@@ -110,6 +111,12 @@ if not DEBUG:
     # Session settings
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+else:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'http')
+    SECURE_PROXY_SSL_HEADER = None
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    SECURE_SSL_REDIRECT = False
 
 # Discord Specific Settings
 DISCORD_KEY = os.environ.get('public_key')

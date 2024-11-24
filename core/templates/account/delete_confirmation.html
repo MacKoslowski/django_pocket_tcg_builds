@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h3>Delete Account</h3>
+                    <p class="text-danger">Warning: This action cannot be undone.</p>
+                    <p>This will:</p>
+                    <ul>
+                        <li>Delete all your decks</li>
+                        <li>Remove all your votes</li>
+                        <li>Delete your profile</li>
+                    </ul>
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            Confirm Delete Account
+                        </button>
+                        <a href="{% url 'home' %}" class="btn btn-secondary">Cancel</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
