@@ -32,7 +32,7 @@ urlpatterns = [
      path('terms/', views.terms, name='terms'),
      path('privacy/', views.privacy, name='privacy'),
      path('account_settings/', views.account_settings, name='account_settings'),
-     path("ads.txt", views.ads_txt_view, alt="ads_txt"),
+     path("ads.txt", views.ads_txt_view, name="ads_txt"),
      #path('sentry-debug/', trigger_error),
 
 ]
