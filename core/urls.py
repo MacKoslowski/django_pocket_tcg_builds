@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
-
+#def trigger_error(request):
+#    division_by_zero = 1 / 0
 app_name = 'core'
 urlpatterns = [
 
@@ -31,5 +32,6 @@ urlpatterns = [
      path('terms/', views.terms, name='terms'),
      path('privacy/', views.privacy, name='privacy'),
      path('account_settings/', views.account_settings, name='account_settings'),
+     #path('sentry-debug/', trigger_error),
 
 ]
