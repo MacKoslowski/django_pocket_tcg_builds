@@ -1,0 +1,126 @@
+<!-- templates/core/account_settings.html -->
+{% extends 'base.html' %}
+{% load socialaccount %}\
+{% load core_tags %}
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Account Info -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Account Information</h5>
+                </div> 
+                {% if user.is_authenticated %}
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        {% get_discord_data user as discord %}
+                        {% if discord.avatar %}
+                            <img src="https://cdn.discordapp.com/avatars/{{ discord.uid }}/{{ discord.avatar }}.png"
+                                 class="rounded-circle me-3"
+                                 width="64"
+                                 height="64"
+                                 alt="{{ user.username }}">
+                        {% else %}
+                            <div class="rounded-circle bg-secondary me-3 d-flex align-items-center justify-content-center"
+                                 style="width: 64px; height: 64px;">
+                                <i class="fas fa-user text-light fa-2x"></i>
+                            </div>
+                        {% endif %}
+                        <div>
+                            <h6 class="mb-1">Discord Username</h6>
+                            <p class="mb-0 text-muted">{{ user.username }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Display Name Form 
+                    <form method="post" class="mb-4">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="update_name">
+                        <div class="mb-3">
+                            <label class="form-label">Display Name</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   name="display_name"
+                                   value="{{ user.display_name }}"
+                                   required
+                                   maxlength="50">
+                            <div class="form-text">This is how you'll appear to other users.</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Display Name</button>
+                    </form>-->
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Account Stats -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Account Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-4 text-center">
+                            <h6 class="mb-1">{{ user.decks.count }}</h6>
+                            <small class="text-muted">Decks Created</small>
+                        </div>
+                        <!--<div class="col-4 text-center">
+                            <h6 class="mb-1">{{ user.votes.count }}</h6>
+                            <small class="text-muted">Votes Cast</small>
+                        </div>-->
+                        <div class="col-4 text-center">
+                            <h6 class="mb-1">{{ user.date_joined|timesince }}</h6>
+                            <small class="text-muted">Member For</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Danger Zone -->
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">Danger Zone</h5>
+                </div>
+                <div class="card-body">
+                    <h6>Delete Account</h6>
+                    <p class="text-muted">Once you delete your account, there is no going back. Please be certain.</p>
+                    <button class="btn btn-danger" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#deleteAccountModal">
+                        Delete Account
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Account Modal -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Account</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-danger">Warning: This action cannot be undone.</p>
+                <p>This will permanently delete:</p>
+                <ul>
+                    <li>Your account information</li>
+                    <li>All your decks</li>
+                    <li>All your votes and interactions</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="delete_account">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Delete My Account</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

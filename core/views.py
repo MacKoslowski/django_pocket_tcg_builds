@@ -16,6 +16,32 @@ from django.contrib.auth import logout
 from .rate_limit import rate_limit
 from datetime import date
 
+@login_required
+def account_settings(request):
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        # if action == 'update_name':
+        #     new_name = request.POST.get('display_name')
+        #     if new_name and not User.objects.filter(display_name=new_name).exists():
+        #         request.user.display_name = new_name
+        #         request.user.save()
+        #         messages.success(request, 'Display name updated successfully!')
+        #     else:
+        #         messages.error(request, 'That name is already taken.')
+                
+        if action == 'delete_account':
+            # Delete user content
+            request.user.decks.all().delete()
+            DeckVote.objects.filter(user_id=request.user.id).delete()
+            # Delete user
+            request.user.delete()
+            logout(request)
+            messages.success(request, 'Your account has been deleted.')
+            return redirect('core:home')
+            
+    return render(request, 'account_settings.html')
+
 def terms(request):
     return render(request, 'term_of_service.html', {
         'today': date.today()

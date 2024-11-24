@@ -30,5 +30,6 @@ urlpatterns = [
      path('decks/all/results/', views.all_decks_results, name='all_decks_results'),
      path('terms/', views.terms, name='terms'),
      path('privacy/', views.privacy, name='privacy'),
+     path('account_settings/', views.account_settings, name='account_settings'),
 
 ]

@@ -2,6 +2,7 @@
 from django import template
 from django.db.models import Count
 from allauth.socialaccount.models import SocialAccount
+from django.urls import reverse
 register = template.Library()
 
 @register.inclusion_tag('card_display.html')
@@ -47,3 +48,18 @@ def get_discord_data(user):
 @register.filter
 def lookup(dictionary, key):
     return dictionary.get(key)
+
+@register.simple_tag
+def login_or_url(url_name, *args):
+    """Returns login URL if user isn't authenticated, otherwise returns named URL"""
+    if args:
+        return reverse(url_name, args=args)
+    return reverse(url_name)
+
+@register.simple_tag(takes_context=True)
+def get_redirect_url(context, url_name, *args):
+    """Get URL with a next parameter for post-login redirect"""
+    target_url = reverse(url_name, args=args)
+    if not context['user'].is_authenticated:
+        return f"/accounts/discord/login/?process=login&next={target_url}"
+    return target_url
